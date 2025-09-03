@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieDatabaseApp.Data;
 
@@ -11,9 +12,11 @@ using MovieDatabaseApp.Data;
 namespace MovieDatabaseApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250903184215_InitSchema")]
+    partial class InitSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,20 +50,6 @@ namespace MovieDatabaseApp.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "1",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "2",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -260,20 +249,6 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.HasIndex("PosterImageId");
 
                     b.ToTable("Actors");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BirthDate = new DateOnly(1965, 4, 4),
-                            FullName = "Robert Downey Jr."
-                        },
-                        new
-                        {
-                            Id = 2,
-                            BirthDate = new DateOnly(1981, 6, 13),
-                            FullName = "Chris Evans"
-                        });
                 });
 
             modelBuilder.Entity("MovieDatabaseApp.Data.Models.Image", b =>
@@ -291,18 +266,6 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Images");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Url = "https://image.pmgstatic.com/cache/resized/w280/files/images/film/posters/000/049/49177_031300.jpg"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Url = "https://image.pmgstatic.com/cache/resized/w280/files/images/film/posters/159/533/159533397_612bbf.jpg"
-                        });
                 });
 
             modelBuilder.Entity("MovieDatabaseApp.Data.Models.Movie", b =>
@@ -328,22 +291,6 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.HasIndex("PosterImageId");
 
                     b.ToTable("Movies");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            PosterImageId = 1,
-                            ReleaseDate = new DateOnly(2008, 5, 2),
-                            Title = "Iron Man"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            PosterImageId = 2,
-                            ReleaseDate = new DateOnly(2011, 7, 22),
-                            Title = "Captain America: První Avenger"
-                        });
                 });
 
             modelBuilder.Entity("MovieDatabaseApp.Data.Models.MovieActor", b =>
@@ -359,18 +306,6 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.HasIndex("ActorId");
 
                     b.ToTable("MovieActors");
-
-                    b.HasData(
-                        new
-                        {
-                            MovieId = 1,
-                            ActorId = 1
-                        },
-                        new
-                        {
-                            MovieId = 2,
-                            ActorId = 2
-                        });
                 });
 
             modelBuilder.Entity("MovieDatabaseApp.Data.Models.Rating", b =>

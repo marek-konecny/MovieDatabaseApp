@@ -24,3 +24,7 @@ services:
       ConnectionStrings__DefaultConnection: "Server=database;Database=MovieDatabaseDb;User Id=sa;Password=adminHesl0-;TrustServerCertificate=True;"
     networks:
       - movie-database-app-bridge
+
+networks:
+  movie-database-app-bridge:
+    driver: bridge

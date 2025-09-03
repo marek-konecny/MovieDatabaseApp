@@ -4,7 +4,7 @@ public class Movie
 {
     public int Id { get; set; }
     public string Title { get; set; } = null!;
-    public DateTime ReleaseDate { get; set; }
+    public DateOnly ReleaseDate { get; set; }
     public int? PosterImageId { get; set; }
 
     public Image? PosterImage { get; set; }

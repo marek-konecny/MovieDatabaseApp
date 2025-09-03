@@ -177,7 +177,7 @@ namespace MovieDatabaseApp.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     PosterImageId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -197,7 +197,7 @@ namespace MovieDatabaseApp.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReleaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReleaseDate = table.Column<DateOnly>(type: "date", nullable: false),
                     PosterImageId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>

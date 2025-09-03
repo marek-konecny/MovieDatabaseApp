@@ -12,7 +12,7 @@ using MovieDatabaseApp.Data;
 namespace MovieDatabaseApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250903165433_InitTestData")]
+    [Migration("20250903184252_InitTestData")]
     partial class InitTestData
     {
         /// <inheritdoc />
@@ -50,6 +50,20 @@ namespace MovieDatabaseApp.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "2",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -234,8 +248,8 @@ namespace MovieDatabaseApp.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("BirthDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("BirthDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -254,13 +268,13 @@ namespace MovieDatabaseApp.Data.Migrations
                         new
                         {
                             Id = 1,
-                            BirthDate = new DateTime(1965, 4, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            BirthDate = new DateOnly(1965, 4, 4),
                             FullName = "Robert Downey Jr."
                         },
                         new
                         {
                             Id = 2,
-                            BirthDate = new DateTime(1981, 6, 13, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            BirthDate = new DateOnly(1981, 6, 13),
                             FullName = "Chris Evans"
                         });
                 });
@@ -305,8 +319,8 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.Property<int?>("PosterImageId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ReleaseDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("ReleaseDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -323,14 +337,14 @@ namespace MovieDatabaseApp.Data.Migrations
                         {
                             Id = 1,
                             PosterImageId = 1,
-                            ReleaseDate = new DateTime(2008, 5, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ReleaseDate = new DateOnly(2008, 5, 2),
                             Title = "Iron Man"
                         },
                         new
                         {
                             Id = 2,
                             PosterImageId = 2,
-                            ReleaseDate = new DateTime(2011, 7, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ReleaseDate = new DateOnly(2011, 7, 22),
                             Title = "Captain America: První Avenger"
                         });
                 });

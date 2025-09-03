@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MovieDatabaseApp.Data.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace MovieDatabaseApp.Data;
 
@@ -22,7 +23,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         base.OnModelCreating(modelBuilder);
 
         InitSchema(modelBuilder); // InitSchema migration
- 
+
+        InitUserRoles(modelBuilder); // InitUserRoles migration
+
         InitTestData(modelBuilder); // InitTestData migration
     }
 
@@ -62,12 +65,20 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithOne()
             .HasForeignKey<UserProfile>(up => up.UserId);
     }
-    
+
+    protected void InitUserRoles(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<IdentityRole>().HasData(
+            new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
+            new IdentityRole { Id = "2", Name = "User", NormalizedName = "USER" }
+        );
+    }
+
     protected void InitTestData(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Actor>().HasData(
-            new Actor { Id = 1, FullName = "Robert Downey Jr.", BirthDate = new DateTime(1965, 4, 4) },
-            new Actor { Id = 2, FullName = "Chris Evans", BirthDate = new DateTime(1981, 6, 13) }
+            new Actor { Id = 1, FullName = "Robert Downey Jr.", BirthDate = new DateOnly(1965, 4, 4) },
+            new Actor { Id = 2, FullName = "Chris Evans", BirthDate = new DateOnly(1981, 6, 13) }
         );
 
         modelBuilder.Entity<Image>().HasData(
@@ -76,8 +87,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         );
 
         modelBuilder.Entity<Movie>().HasData(
-            new Movie { Id = 1, Title = "Iron Man", ReleaseDate = new DateTime(2008, 5, 2), PosterImageId = 1 },
-            new Movie { Id = 2, Title = "Captain America: První Avenger", ReleaseDate = new DateTime(2011, 7, 22), PosterImageId = 2 }
+            new Movie { Id = 1, Title = "Iron Man", ReleaseDate = new DateOnly(2008, 5, 2), PosterImageId = 1 },
+            new Movie { Id = 2, Title = "Captain America: První Avenger", ReleaseDate = new DateOnly(2011, 7, 22), PosterImageId = 2 }
         );
 
         modelBuilder.Entity<MovieActor>().HasData(

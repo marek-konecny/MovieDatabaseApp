@@ -18,8 +18,8 @@ namespace MovieDatabaseApp.Data.Migrations
                 columns: new[] { "Id", "BirthDate", "FullName", "PosterImageId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(1965, 4, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), "Robert Downey Jr.", null },
-                    { 2, new DateTime(1981, 6, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "Chris Evans", null }
+                    { 1, new DateOnly(1965, 4, 4), "Robert Downey Jr.", null },
+                    { 2, new DateOnly(1981, 6, 13), "Chris Evans", null }
                 });
 
             migrationBuilder.InsertData(
@@ -36,8 +36,8 @@ namespace MovieDatabaseApp.Data.Migrations
                 columns: new[] { "Id", "PosterImageId", "ReleaseDate", "Title" },
                 values: new object[,]
                 {
-                    { 1, 1, new DateTime(2008, 5, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), "Iron Man" },
-                    { 2, 2, new DateTime(2011, 7, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "Captain America: První Avenger" }
+                    { 1, 1, new DateOnly(2008, 5, 2), "Iron Man" },
+                    { 2, 2, new DateOnly(2011, 7, 22), "Captain America: První Avenger" }
                 });
 
             migrationBuilder.InsertData(
