@@ -1,0 +1,97 @@
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
+namespace MovieDatabaseApp.Data.Migrations
+{
+    /// <inheritdoc />
+    public partial class InitTestData : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.InsertData(
+                table: "Actors",
+                columns: new[] { "Id", "BirthDate", "FullName", "PosterImageId" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(1965, 4, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), "Robert Downey Jr.", null },
+                    { 2, new DateTime(1981, 6, 13, 0, 0, 0, 0, DateTimeKind.Unspecified), "Chris Evans", null }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Images",
+                columns: new[] { "Id", "Url" },
+                values: new object[,]
+                {
+                    { 1, "https://image.pmgstatic.com/cache/resized/w280/files/images/film/posters/000/049/49177_031300.jpg" },
+                    { 2, "https://image.pmgstatic.com/cache/resized/w280/files/images/film/posters/159/533/159533397_612bbf.jpg" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Movies",
+                columns: new[] { "Id", "PosterImageId", "ReleaseDate", "Title" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(2008, 5, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), "Iron Man" },
+                    { 2, 2, new DateTime(2011, 7, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "Captain America: První Avenger" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "MovieActors",
+                columns: new[] { "ActorId", "MovieId" },
+                values: new object[,]
+                {
+                    { 1, 1 },
+                    { 2, 2 }
+                });
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DeleteData(
+                table: "MovieActors",
+                keyColumns: new[] { "ActorId", "MovieId" },
+                keyValues: new object[] { 1, 1 });
+
+            migrationBuilder.DeleteData(
+                table: "MovieActors",
+                keyColumns: new[] { "ActorId", "MovieId" },
+                keyValues: new object[] { 2, 2 });
+
+            migrationBuilder.DeleteData(
+                table: "Actors",
+                keyColumn: "Id",
+                keyValue: 1);
+
+            migrationBuilder.DeleteData(
+                table: "Actors",
+                keyColumn: "Id",
+                keyValue: 2);
+
+            migrationBuilder.DeleteData(
+                table: "Movies",
+                keyColumn: "Id",
+                keyValue: 1);
+
+            migrationBuilder.DeleteData(
+                table: "Movies",
+                keyColumn: "Id",
+                keyValue: 2);
+
+            migrationBuilder.DeleteData(
+                table: "Images",
+                keyColumn: "Id",
+                keyValue: 1);
+
+            migrationBuilder.DeleteData(
+                table: "Images",
+                keyColumn: "Id",
+                keyValue: 2);
+        }
+    }
+}

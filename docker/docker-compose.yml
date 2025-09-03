@@ -1,0 +1,26 @@
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: MovieDatabaseAppDB
+    environment:
+      SA_PASSWORD: "adminHesl0-"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    # I decided to use .NET migrations instead
+    # volumes:
+    #  - ./db/scripts:/docker-entrypoint-initdb.d
+    networks:
+      - movie-database-app-bridge
+
+  moviedatabaseapp:
+    build:
+      context: ../src/MovieDatabaseApp
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=database;Database=MovieDatabaseDb;User Id=sa;Password=adminHesl0-;TrustServerCertificate=True;"
+    networks:
+      - movie-database-app-bridge

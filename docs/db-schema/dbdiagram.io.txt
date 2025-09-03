@@ -1,0 +1,65 @@
+Table ApplicationUsers {
+  Id string [primary key]
+  UserName string
+  PasswordHash string
+  ______ string
+}
+
+Table AspNetRoles {
+  Id string [primary key]
+  Name string
+  ______ string
+}
+
+Table AspNetUserRoles {
+  UserId string [ref: > ApplicationUsers.Id, not null]
+  RoleId string [ref: > AspNetRoles.Id, not null]
+  
+  indexes {
+    (UserId, RoleId) [pk]
+  }
+}
+
+Table Actors {
+  Id integer [primary key]
+  FullName varchar(200) [not null]
+  BirthDate date [not null]
+}
+
+Table Images {
+  Id integer [primary key]
+  Url varchar(500) [not null]
+}
+
+Table Movies {
+  Id integer [primary key]
+  Title varchar(200) [not null]
+  ReleaseDate date [not null]
+  PosterImageId integer [ref: > Images.Id]
+}
+
+Table MovieActors {
+  MovieId integer [ref: > Movies.Id, not null]
+  ActorId integer [ref: > Actors.Id, not null]
+
+  indexes {
+    (MovieId, ActorId) [pk]
+  }
+}
+
+Table Ratings {
+  UserId string [ref: > ApplicationUsers.Id, not null]
+  MovieId integer [ref: > Movies.Id, not null]
+  Points tinyint [not null]
+  Text varchar(1000) [not null]
+
+  indexes {
+    (UserId, MovieId) [pk]
+  }
+}
+
+Table UserProfiles {
+  UserId string [ref: > ApplicationUsers.Id, primary key, not null]
+  RegistrationTime datetime [not null]
+  ProfileImageId integer [ref: > Images.Id]
+}
