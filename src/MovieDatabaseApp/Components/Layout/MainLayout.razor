@@ -5,15 +5,24 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
+<MudLayout Class="d-flex flex-column" Style="min-height: 100vh;">
     <MudPaper Class="d-flex flex-wrap pa-4" Square="true" Outlined="true">
-        <h1>MovieDatabaseApp</h1>
+        <div id="app-logo">
+            <MudIcon  Icon="@Icons.Material.Outlined.LocalMovies" Size="Size.Large"/>
+        </div>
+        <MudText Typo="Typo.h5" Class="ms-n3 z-20" ><a href="/">MovieDatabaseApp</a></MudText>
         <MudSpacer />
         <NavMenu />
     </MudPaper>
     <MudMainContent Class="pt-16 pa-4">
         @Body
     </MudMainContent>
+
+    <MudSpacer />
+    <MudDivider Class="flex-grow-0" />
+    <MudText Typo="Typo.body2" Align="Align.Center" Class="pa-4">
+        &copy; @DateTime.Now.Year.ToString() - <MudLink Href="https://konecnymarek.cz" Target="_blank">Marek Konečný</MudLink>
+    </MudText>
 </MudLayout>
 
 
