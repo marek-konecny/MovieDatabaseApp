@@ -115,25 +115,22 @@
                 {
                     @foreach (var rating in OtherRatings)
                     {
-                        <MudCard Class="mb-4">
-                            <MudCardHeader>
-                                <MudText Typo="Typo.subtitle2">@rating.User?.UserName</MudText>
-                                <MudSpacer />
-                                <MovieRatingStars RatingValue="rating.Points" />
-                            </MudCardHeader>
-                            @if (!string.IsNullOrWhiteSpace(rating.Text))
-                            {
-                                <MudCardContent>
-                                    <MudText Typo="Typo.body2">@rating.Text</MudText>
-                                </MudCardContent>
-                            }
-                            <AuthorizeView Roles="Admin">
-                                <MudCardActions Class="gap-2">
-                                    <MudButton Color="Color.Primary" OnClick="@(() => OpenReviewDialog(rating))" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">Admin Edit</MudButton>
-                                    <MudButton Color="Color.Error" OnClick="@(() => OpenReviewDialog(MyRating))" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">Admin Delete</MudButton>
-                                </MudCardActions>
-                            </AuthorizeView>
-                        </MudCard>
+                        <ReviewCard Rating="rating" ActionsRoles="Admin">
+                            <CardHeaderContent>
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <MudLink Href="@($"/Profile/{rating.UserId}")" Typo="Typo.subtitle2">@rating.User?.UserName</MudLink>
+                                    </Authorized>
+                                    <NotAuthorized>
+                                        <MudText Typo="Typo.subtitle2">@rating.User?.UserName</MudText>
+                                    </NotAuthorized>
+                                </AuthorizeView>
+                            </CardHeaderContent>
+                            <CardActionsContent>
+                                <MudButton Color="Color.Primary" OnClick="@(() => OpenReviewDialog(rating))" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">Admin Edit</MudButton>
+                                <MudButton Color="Color.Error" OnClick="@(() => OpenReviewDialog(MyRating))" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">Admin Delete</MudButton>
+                            </CardActionsContent>
+                        </ReviewCard>
                     }
                 }
             }

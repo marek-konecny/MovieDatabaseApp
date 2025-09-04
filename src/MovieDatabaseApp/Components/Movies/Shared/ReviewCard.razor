@@ -1,0 +1,48 @@
+@using MovieDatabaseApp.Data.Models
+@using MovieDatabaseApp.Components.Movies.Shared
+
+<MudCard Class="mb-4">
+    <MudCardHeader>
+        @if (CardHeaderContent != null)
+        {
+            @CardHeaderContent
+        }
+        <MudSpacer />
+        <MovieRatingStars RatingValue="Rating.Points" />
+    </MudCardHeader>
+    
+    @if (!string.IsNullOrWhiteSpace(Rating.Text))
+    {
+        <MudCardContent>
+            <MudText Typo="Typo.body2">@Rating.Text</MudText>
+        </MudCardContent>
+    }
+
+    @if (CardActionsContent != null)
+    {
+        <AuthorizeView Roles="@ActionsRoles">
+            <Authorized>
+                <MudCardActions Class="gap-2">
+                    @CardActionsContent
+                </MudCardActions>
+            </Authorized>
+        </AuthorizeView>
+    }
+</MudCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required Rating Rating { get; set; }
+
+    [Parameter]
+    public RenderFragment? CardHeaderContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? CardActionsContent { get; set; }
+
+    ///
+    /// TODO: I dont like this hack very much...
+    ///
+    [Parameter]
+    public string? ActionsRoles { get; set; }
+}

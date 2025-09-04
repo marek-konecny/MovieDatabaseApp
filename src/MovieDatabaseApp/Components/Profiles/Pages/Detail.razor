@@ -1,0 +1,91 @@
+@page "/Profile/{UserId}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize] // This still requires a user to be logged in to view ANY profile.
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.EntityFrameworkCore
+@using MovieDatabaseApp.Data
+@using MovieDatabaseApp.Data.Models
+@using System.Security.Claims
+@using MovieDatabaseApp.Components.Movies.Shared
+
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+
+<PageTitle>@UserProfile?.User.UserName</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8">
+    @if (UserProfile == null)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+    }
+    else
+    {
+        <MudPaper Class="pa-6">
+            <MudGrid>
+                <MudItem xs="12" sm="4">
+                    @if (!string.IsNullOrWhiteSpace(UserProfile.ProfileImage?.Url))
+                    {
+                        <MudAvatar Src="@UserProfile.ProfileImage.Url" Style="height:150px; width:150px; font-size: 4rem;" />
+                    }
+                    else
+                    {
+                        <MudAvatar Color="Color.Tertiary" Style="height:150px; width:150px; font-size: 4rem;">
+                            @(UserProfile.User.UserName?.ToUpper().FirstOrDefault())
+                        </MudAvatar>
+                    }
+                </MudItem>
+                <MudItem xs="12" sm="8">
+                    <MudText Typo="Typo.h4" GutterBottom="true">@UserProfile.User.UserName</MudText>
+                    <MudText Typo="Typo.body1" Color="Color.Inherit">
+                        Member since: @UserProfile.User.RegistrationTime.ToShortDateString()
+                    </MudText>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+
+        @if (UserRatings.Any())
+        {
+            <MudText Typo="Typo.h5" Class="mt-10 mb-4"> Reviews </MudText>
+            @foreach (var rating in UserRatings)
+            {
+                <ReviewCard Rating="rating">
+                    <CardHeaderContent>
+                        <MudLink Href="@($"/Movies/{rating.MovieId}")" Typo="Typo.subtitle2">@rating.Movie.Title (@rating.Movie.ReleaseDate?.Year)</MudLink>
+                    </CardHeaderContent>
+                </ReviewCard>
+            }
+        }
+    }
+</MudContainer>
+
+
+@code {
+    [Parameter]
+    public required string UserId { get; set; }
+
+    private UserProfile? UserProfile;
+    private List<Rating> UserRatings = new();
+    protected override async Task OnInitializedAsync()
+    {
+        UserProfile = await DbContext.UserProfiles
+            .Include(up => up.User)
+            .Include(up => up.ProfileImage)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(up => up.UserId == UserId);
+
+        if (UserProfile == null)
+        {
+            //NavigationManager.NavigateTo("/Profiles");
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+
+        UserRatings = await DbContext.Ratings
+            .Include(r => r.Movie)
+            .Where(r => r.UserId == UserId)
+            .OrderByDescending(r => r.Points)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+}
