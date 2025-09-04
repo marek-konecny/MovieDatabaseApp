@@ -39,7 +39,7 @@ namespace MovieDatabaseApp.Data.Migrations
                 values: new object[,]
                 {
                     { 1, 1, new DateOnly(2008, 5, 2), "Iron Man" },
-                    { 2, 2, new DateOnly(2011, 7, 22), "Captain America: První Avenger" }
+                    { 2, 2, new DateOnly(2011, 7, 22), "Captain America: The First Avenger" }
                 });
 
             migrationBuilder.InsertData(

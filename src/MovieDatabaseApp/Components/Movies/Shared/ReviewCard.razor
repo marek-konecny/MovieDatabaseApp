@@ -1,7 +1,7 @@
 @using MovieDatabaseApp.Data.Models
 @using MovieDatabaseApp.Components.Movies.Shared
 
-<MudCard Class="mb-4">
+<MudCard Class="mb-4" Outlined="@Outlined">
     <MudCardHeader>
         @if (CardHeaderContent != null)
         {
@@ -39,6 +39,9 @@
 
     [Parameter]
     public RenderFragment? CardActionsContent { get; set; }
+
+    [Parameter]
+    public bool Outlined { get; set; } = false;
 
     ///
     /// TODO: I dont like this hack very much...

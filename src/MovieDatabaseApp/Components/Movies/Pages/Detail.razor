@@ -5,7 +5,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
 @using MovieDatabaseApp.Components.Movies.Shared
-@inject ApplicationDbContext ApplicationDbContext
+@inject IDbContextFactory<ApplicationDbContext> DbContextFactory
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
 
@@ -92,23 +92,15 @@
                 
                 @if (MyRating != null)
                 {
-                    <MudCard Class="mb-6" Elevation="0" Outlined="true">
-                        <MudCardHeader>
+                    <ReviewCard Rating="MyRating" Outlined>
+                        <CardHeaderContent>
                             <MudText Typo="Typo.subtitle2">My Review</MudText>
-                            <MudSpacer />
-                            <MovieRatingStars RatingValue="MyRating.Points" />
-                        </MudCardHeader>
-                        @if (!string.IsNullOrWhiteSpace(MyRating.Text))
-                        {
-                            <MudCardContent>
-                                <MudText Typo="Typo.body2">@MyRating.Text</MudText>
-                            </MudCardContent>
-                        }
-                        <MudCardActions Class="gap-2">
+                        </CardHeaderContent>
+                        <CardActionsContent>
                             <MudButton Color="Color.Primary" OnClick="@(() => OpenReviewDialog(MyRating))" StartIcon="@Icons.Material.Filled.Edit" IconSize="Size.Small">Edit Review</MudButton>
                             <MudButton Color="Color.Error" OnClick="@(() => OpenReviewDialog(MyRating))" StartIcon="@Icons.Material.Filled.Delete" IconSize="Size.Small">Delete</MudButton>
-                        </MudCardActions>
-                    </MudCard>
+                        </CardActionsContent>
+                    </ReviewCard>
                 }
 
                 @if (OtherRatings.Any()) 
@@ -163,12 +155,15 @@
             UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
+
         await LoadMovieData();
     }
 
     private async Task LoadMovieData()
     {
-        Movie = await ApplicationDbContext.Movies
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        Movie = await dbContext.Movies
             .Include(m => m.PosterImage)
             .Include(m => m.Ratings)
                 .ThenInclude(r => r.User)
@@ -193,6 +188,8 @@
 
     private async Task OpenReviewDialog(Rating? editedRating)
     {
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
         var parameters = new DialogParameters();
         Rating ratingModel;
 
@@ -210,7 +207,7 @@
         else
         {
             ratingModel =
-                await ApplicationDbContext.Ratings.FindAsync(editedRating.MovieId, editedRating.UserId)
+                await dbContext.Ratings.FindAsync(editedRating.MovieId, editedRating.UserId)
                 ?? throw new InvalidOperationException("Invalid branch - edited rating not found in DB.");
             parameters.Add("RatingModel", ratingModel);
             parameters.Add("EditingExisting", true);
@@ -220,13 +217,14 @@
         var result = await dialog.Result;
         if (!(result?.Canceled ?? false)) {
             await LoadMovieData();
-            StateHasChanged();
         }
     }
 
     private async Task OpenMovieEditDialog()
     {
-        var movieToEdit = await ApplicationDbContext.Movies
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        var movieToEdit = await dbContext.Movies
             .Include(m => m.PosterImage)
             .Include(m => m.MovieActors)
             .FirstOrDefaultAsync(m => m.Id == MovieId);
@@ -244,7 +242,6 @@
         var result = await dialog.Result;
         if (!(result?.Canceled ?? false)) {
             await LoadMovieData();
-            StateHasChanged();
         }
     }
 }

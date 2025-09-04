@@ -6,7 +6,7 @@
 @using MovieDatabaseApp.Components.Movies.Shared
 
 @inject NavigationManager NavigationManager
-@inject ApplicationDbContext ApplicationDbContext
+@inject IDbContextFactory<ApplicationDbContext> DbContextFactory
 @inject IDialogService DialogService
 
 <PageTitle>Movie Search</PageTitle>
@@ -88,7 +88,9 @@
 
     private async Task<GridData<Movie>> NewQuery(GridState<Movie> state)
     {
-        IQueryable<Movie> query = ApplicationDbContext.Movies
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        IQueryable<Movie> query = dbContext.Movies
             .Include(m => m.PosterImage)
             .Include(m => m.Ratings); 
 

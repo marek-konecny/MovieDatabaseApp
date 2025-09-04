@@ -3,7 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @using MudBlazor
 
-@inject ApplicationDbContext DbContext
+@inject IDbContextFactory<ApplicationDbContext> DbContextFactory
 
 <MudDialog>
     <TitleContent>
@@ -58,7 +58,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        AllMovies = await DbContext.Movies
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        AllMovies = await dbContext.Movies
             .OrderBy(m => m.Title)
             .ThenByDescending(m => m.ReleaseDate)
             .ToListAsync();
@@ -95,12 +97,14 @@
 
         await form.Validate();
         if (!form.IsValid) return;
+
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
         
         if (!string.IsNullOrWhiteSpace(PosterImageUrl))
         {
             if (ActorModel.PosterImage == null || ActorModel.PosterImage.Url != PosterImageUrl)
             {
-                var existingImage = await DbContext.Images.FirstOrDefaultAsync(i => i.Url == PosterImageUrl);
+                var existingImage = await dbContext.Images.FirstOrDefaultAsync(i => i.Url == PosterImageUrl);
                 if (existingImage != null)
                 {
                     ActorModel.PosterImage = existingImage;
@@ -131,7 +135,7 @@
                 .ToList();
             
             foreach (var movieActor in movieActorsToRemove)
-                DbContext.MovieActors.Remove(movieActor);
+                dbContext.MovieActors.Remove(movieActor);
             foreach (var movieId in movieIdsToAdd)
                 ActorModel.MovieActors.Add(new MovieActor { MovieId = movieId });
         }
@@ -140,14 +144,14 @@
         {
             foreach(var movieId in SelectedMovieIds)
                 ActorModel.MovieActors.Add(new MovieActor { MovieId = movieId });
-            DbContext.Actors.Add(ActorModel);
+            dbContext.Actors.Add(ActorModel);
         }
         else
         {
-            DbContext.Actors.Update(ActorModel);
+            dbContext.Actors.Update(ActorModel);
         }
 
-        await DbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
         MudDialog.Close(DialogResult.Ok(true));
     }
 

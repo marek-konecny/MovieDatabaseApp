@@ -3,7 +3,7 @@
 @using Microsoft.EntityFrameworkCore
 @using MudBlazor
 
-@inject ApplicationDbContext DbContext
+@inject IDbContextFactory<ApplicationDbContext> DbContextFactory
 
 <MudDialog>
     <TitleContent>
@@ -48,17 +48,19 @@
         await form.Validate();
         if (!form.IsValid) return;
 
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
         if (!EditingExisting)
         {
             Console.WriteLine("Adding new rating");
-            DbContext.Ratings.Add(RatingModel);
+            dbContext.Ratings.Add(RatingModel);
         }
         else
         {
-            DbContext.Ratings.Update(RatingModel);
+            dbContext.Ratings.Update(RatingModel);
         }
 
-        await DbContext.SaveChangesAsync();
+        await dbContext.SaveChangesAsync();
         MudDialog.Close(DialogResult.Ok(true));
     }
 

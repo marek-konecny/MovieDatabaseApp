@@ -3,7 +3,7 @@
 @using MovieDatabaseApp.Data.Models
 @using Microsoft.EntityFrameworkCore
 @using MovieDatabaseApp.Components.Actors.Shared
-@inject ApplicationDbContext ApplicationDbContext
+@inject IDbContextFactory<ApplicationDbContext> DbContextFactory
 @inject IDialogService DialogService
 
 <PageTitle>Actor Search</PageTitle>
@@ -61,7 +61,9 @@
 
     private async Task<GridData<Actor>> LoadActors(GridState<Actor> state)
     {
-        IQueryable<Actor> query = ApplicationDbContext.Actors
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        IQueryable<Actor> query = dbContext.Actors
             .Include(a => a.PosterImage)
             .Include(a => a.MovieActors);
 

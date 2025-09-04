@@ -1,6 +1,6 @@
 @page "/Profile/{UserId}"
 @using Microsoft.AspNetCore.Authorization
-@attribute [Authorize] // This still requires a user to be logged in to view ANY profile.
+@attribute [Authorize]
 
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.EntityFrameworkCore
@@ -9,7 +9,7 @@
 @using System.Security.Claims
 @using MovieDatabaseApp.Components.Movies.Shared
 
-@inject ApplicationDbContext DbContext
+@inject IDbContextFactory<ApplicationDbContext> DbContextFactory
 @inject NavigationManager NavigationManager
 
 <PageTitle>@UserProfile?.User.UserName</PageTitle>
@@ -68,7 +68,9 @@
     private List<Rating> UserRatings = new();
     protected override async Task OnInitializedAsync()
     {
-        UserProfile = await DbContext.UserProfiles
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        UserProfile = await dbContext.UserProfiles
             .Include(up => up.User)
             .Include(up => up.ProfileImage)
             .AsNoTracking()
@@ -81,7 +83,7 @@
             return;
         }
 
-        UserRatings = await DbContext.Ratings
+        UserRatings = await dbContext.Ratings
             .Include(r => r.Movie)
             .Where(r => r.UserId == UserId)
             .OrderByDescending(r => r.Points)

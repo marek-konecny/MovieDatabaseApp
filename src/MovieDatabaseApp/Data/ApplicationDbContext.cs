@@ -90,7 +90,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         modelBuilder.Entity<Movie>().HasData(
             new Movie { Id = 1, Title = "Iron Man", ReleaseDate = new DateOnly(2008, 5, 2), PosterImageId = 1 },
-            new Movie { Id = 2, Title = "Captain America: První Avenger", ReleaseDate = new DateOnly(2011, 7, 22), PosterImageId = 2 }
+            new Movie { Id = 2, Title = "Captain America: The First Avenger", ReleaseDate = new DateOnly(2011, 7, 22), PosterImageId = 2 }
         );
 
         modelBuilder.Entity<MovieActor>().HasData(

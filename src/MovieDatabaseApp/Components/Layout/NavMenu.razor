@@ -9,7 +9,7 @@
 
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthStateProvider
-@inject ApplicationDbContext ApplicationDbContext
+@inject IDbContextFactory<ApplicationDbContext> DbContextFactory
 
 <MudNavMenu class="d-flex gap-2" Rounded="true" Color="Color.Primary">
     <MudNavLink Href="Movies" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Movie">Movies</MudNavLink>
@@ -17,11 +17,11 @@
     
     <AuthorizeView>
         <Authorized>
-            <AuthorizeView Roles="Admin">
+            @* <AuthorizeView Roles="Admin">
                 <Authorized Context="adminContext">
                     <MudNavLink Href="Profiles" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonSearch">Users</MudNavLink>
                 </Authorized>
-            </AuthorizeView>
+            </AuthorizeView> *@
 
             <div class="ml-7 d-flex gap-2">
                 <MudNavLink Icon="@Icons.Material.Rounded.Person" Href="Account/Manage" Match="NavLinkMatch.Prefix">Account</MudNavLink>
@@ -63,7 +63,8 @@
         if (userId != null)
         {
             Console.WriteLine("User ID: " + userId);
-            var userProfile = await ApplicationDbContext.UserProfiles
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            var userProfile = await dbContext.UserProfiles
                 .Include(up => up.ProfileImage)
                 .FirstOrDefaultAsync(up => up.UserId == userId);
 

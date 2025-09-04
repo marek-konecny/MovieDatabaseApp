@@ -4,7 +4,7 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Authorization
 @using MovieDatabaseApp.Components.Actors.Shared
-@inject ApplicationDbContext ApplicationDbContext
+@inject IDbContextFactory<ApplicationDbContext> DbContextFactory
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
 
@@ -86,13 +86,15 @@
 
     private async Task LoadActorData()
     {
-        var trackedEntries = ApplicationDbContext.ChangeTracker.Entries().ToList();
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        var trackedEntries = dbContext.ChangeTracker.Entries().ToList();
         foreach (var entry in trackedEntries)
         {
             entry.State = EntityState.Detached;
         }
 
-        Actor = await ApplicationDbContext.Actors
+        Actor = await dbContext.Actors
             .Include(a => a.PosterImage)
             .Include(a => a.MovieActors)
                 .ThenInclude(ma => ma.Movie) 
@@ -110,7 +112,9 @@
 
     private async Task OpenActorEditDialog()
     {
-        var actorToEdit = await ApplicationDbContext.Actors
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        var actorToEdit = await dbContext.Actors
             .Include(a => a.PosterImage)
             .Include(a => a.MovieActors)
             .FirstOrDefaultAsync(a => a.Id == ActorId);
@@ -127,7 +131,6 @@
         var result = await dialog.Result;
         if (!(result?.Canceled ?? false)) {
             await LoadActorData();
-            StateHasChanged();
         }
     }
 }

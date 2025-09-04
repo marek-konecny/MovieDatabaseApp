@@ -357,7 +357,7 @@ namespace MovieDatabaseApp.Data.Migrations
                             Id = 2,
                             PosterImageId = 2,
                             ReleaseDate = new DateOnly(2011, 7, 22),
-                            Title = "Captain America: První Avenger"
+                            Title = "Captain America: The First Avenger"
                         });
                 });
 
