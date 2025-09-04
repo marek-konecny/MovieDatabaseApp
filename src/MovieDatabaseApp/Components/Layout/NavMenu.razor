@@ -8,73 +8,50 @@
 @using System.Security.Claims
 
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ApplicationDbContext ApplicationDbContext
 
 <MudNavMenu class="d-flex gap-2" Rounded="true" Color="Color.Primary">
     <MudNavLink Href="Movies" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Movie">Movies</MudNavLink>
     <MudNavLink Href="Actors" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Stars">Actors</MudNavLink>
-    <AuthorizeView Roles="Admin">
+    
+    <AuthorizeView>
         <Authorized>
-            <MudNavLink Href="Profiles" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.SupervisedUserCircle">Users</MudNavLink>
-        </Authorized>
+            <AuthorizeView Roles="Admin">
+                <Authorized Context="adminContext">
+                    <MudNavLink Href="Profiles" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonSearch">Users</MudNavLink>
+                </Authorized>
+            </AuthorizeView>
 
-
-        <Authorized>
-            <MudMenu>
-                <ActivatorContent>
-                    @if (profileImageUrl is not null)
-                    {
-                        <MudImage Src="@profileImageUrl" />
-                    }
-                    else
-                    {
-                        <MudAvatar Variant="Variant.Outlined">
-                            <MudIcon Icon="@Icons.Material.Filled.Person" />
-                        </MudAvatar>
-                    }
-                </ActivatorContent>
-                <ChildContent>
-                    <MudMenuItem Icon="@Icons.Material.Filled.Person" Href="Account/Manage" Label="Manage Profile" />
-                    <form action="Account/Logout" method="post">
-                        <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                        <button type="submit" class="mud-nav-link mud-ripple">
-                            <MudIcon Icon="@Icons.Material.Filled.Logout" Class="mr-3"></MudIcon> Logout
-                        </button>
-                    </form>
-                </ChildContent>
-            </MudMenu>
+            <div class="ml-7 d-flex gap-2">
+                <MudNavLink Icon="@Icons.Material.Rounded.Person" Href="Account/Manage" Match="NavLinkMatch.Prefix">Account</MudNavLink>
+                    
+                <form action="Account/Logout" method="post">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="ReturnUrl" value="@currentUrl"/>
+                    <button type="submit" class="mud-nav-link mud-ripple"><MudIcon Icon="@Icons.Material.Outlined.Logout"/></button>
+                </form>
+            </div>
         </Authorized>
         <NotAuthorized>
-            <MudMenu>
-                <ActivatorContent>
-                    <MudAvatar Variant="Variant.Outlined">
-                        <MudIcon Icon="@Icons.Material.Filled.Person" />
-                    </MudAvatar>
-                </ActivatorContent>
-                <ChildContent>
-                    <MudMenuItem Icon="@Icons.Material.Filled.Password" Href="Account/Login" Label="Login" />
-                    <MudMenuItem Icon="@Icons.Material.Filled.Person" Href="Account/Register" Label="Register" />
-                </ChildContent>
-            </MudMenu>
+            <div class="ml-7 d-flex gap-2">
+                <MudNavLink Href="Account/Login" Icon="@Icons.Material.Filled.Password" Match="NavLinkMatch.Prefix">Login</MudNavLink>
+                <MudNavLink Href="Account/Register" Icon="@Icons.Material.Filled.Person" Match="NavLinkMatch.Prefix">Register</MudNavLink>
+            </div>
         </NotAuthorized>
     </AuthorizeView>
-
-
 </MudNavMenu>
-
-@inject AuthenticationStateProvider AuthStateProvider
-@inject ApplicationDbContext ApplicationDbContext
 
 @code {
     private string? currentUrl;
 
-    private string? profileImageUrl = null;
+    @* private string? profileImageUrl = null;
 
     [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = default!;
+    private HttpContext HttpContext { get; set; } = default!; *@
 
-
-    protected override async Task OnInitializedAsync()
+    @*protected override async Task OnInitializedAsync()  void OnInitialized()*@
+    protected override void OnInitialized()
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
