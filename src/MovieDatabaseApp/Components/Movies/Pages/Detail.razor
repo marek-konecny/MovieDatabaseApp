@@ -1,0 +1,253 @@
+@page "/Movies/{MovieId:int}"
+@using MovieDatabaseApp.Data
+@using MovieDatabaseApp.Data.Models
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using MovieDatabaseApp.Components.Movies.Shared
+@inject ApplicationDbContext ApplicationDbContext
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+
+<PageTitle>@Movie?.Title</PageTitle>
+
+<CascadingAuthenticationState>
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        @if (Movie == null)
+        {
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        }
+        else
+        {
+            <MudPaper Class="pa-8">
+                <MudGrid>
+                    <MudItem xs="12" sm="4">
+                        @if (Movie.PosterImage?.Url != null)
+                        {
+                            <MudImage Src="@Movie.PosterImage.Url" Fluid />
+                        }
+                        else
+                        {
+                            <MudPaper Height="100%" Class="d-flex align-center justify-center bg-light" Elevation="0">
+                                <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Color="Color.Dark" Size="Size.Large" />
+                            </MudPaper>
+                        }
+                    </MudItem>
+                    <MudItem xs="12" sm="8">
+                        <MudText Typo="Typo.h4" GutterBottom="true">@Movie.Title</MudText>
+                        
+                        <MudText Typo="Typo.subtitle1" Class="mb-4">Release Date: @Movie.ReleaseDate?.ToString()</MudText>
+
+                        <MudText Typo="Typo.h6">
+                            Rating:
+                            @if (Movie.Ratings?.Any() == true) 
+                            {
+                                <MudText Typo="Typo.h6" Inline="true" Color="Color.Primary">
+                                    @((Movie.Ratings.Average(r => r.Points) * 10).ToString("0")) %
+                                </MudText>
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Small" Color="Color.Primary" />
+                            }
+                        </MudText>
+
+                        <MudDivider Class="my-4" />
+
+                        @if (Movie.MovieActors?.Any() == true) 
+                        {
+                            <MudText Typo="Typo.h6">Actors</MudText>
+                            <MudPaper Square="true" Elevation="0" Class="d-flex flex-wrap gap-3">
+                                @foreach (var movieActor in Movie.MovieActors)
+                                {
+                                    <MudLink Href="@($"/Actors/{movieActor.ActorId}")">@movieActor.Actor.FullName</MudLink><br />
+                                }
+                            </MudPaper>
+                        }
+
+                    </MudItem>
+                </MudGrid>
+
+                <AuthorizeView Roles="Admin">
+                    <MudButton Color="Color.Primary" OnClick="OpenMovieEditDialog" Class="mt-4" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">
+                        Admin Edit Movie
+                    </MudButton>
+                </AuthorizeView>
+            </MudPaper>
+
+            <AuthorizeView>
+                <Authorized>
+                    @if (MyRating == null)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => OpenReviewDialog(null))" Class="mt-8" StartIcon="@Icons.Material.Filled.RateReview">
+                            Write a Review
+                        </MudButton>
+                    }
+                </Authorized>
+            </AuthorizeView>
+
+            @if (MyRating != null || OtherRatings.Any())
+            {
+                <MudText Typo="Typo.h5" Class="mt-10 mb-4"> Reviews </MudText>
+                
+                @if (MyRating != null)
+                {
+                    <MudCard Class="mb-6" Elevation="0" Outlined="true">
+                        <MudCardHeader>
+                            <MudText Typo="Typo.subtitle2">My Review</MudText>
+                            <MudSpacer />
+                            <MovieRatingStars RatingValue="MyRating.Points" />
+                        </MudCardHeader>
+                        @if (!string.IsNullOrWhiteSpace(MyRating.Text))
+                        {
+                            <MudCardContent>
+                                <MudText Typo="Typo.body2">@MyRating.Text</MudText>
+                            </MudCardContent>
+                        }
+                        <MudCardActions Class="gap-2">
+                            <MudButton Color="Color.Primary" OnClick="@(() => OpenReviewDialog(MyRating))" StartIcon="@Icons.Material.Filled.Edit" IconSize="Size.Small">Edit Review</MudButton>
+                            <MudButton Color="Color.Error" OnClick="@(() => OpenReviewDialog(MyRating))" StartIcon="@Icons.Material.Filled.Delete" IconSize="Size.Small">Delete</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                }
+
+                @if (OtherRatings.Any()) 
+                {
+                    @foreach (var rating in OtherRatings)
+                    {
+                        <MudCard Class="mb-4">
+                            <MudCardHeader>
+                                <MudText Typo="Typo.subtitle2">@rating.User?.UserName</MudText>
+                                <MudSpacer />
+                                <MovieRatingStars RatingValue="rating.Points" />
+                            </MudCardHeader>
+                            @if (!string.IsNullOrWhiteSpace(rating.Text))
+                            {
+                                <MudCardContent>
+                                    <MudText Typo="Typo.body2">@rating.Text</MudText>
+                                </MudCardContent>
+                            }
+                            <AuthorizeView Roles="Admin">
+                                <MudCardActions Class="gap-2">
+                                    <MudButton Color="Color.Primary" OnClick="@(() => OpenReviewDialog(rating))" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">Admin Edit</MudButton>
+                                    <MudButton Color="Color.Error" OnClick="@(() => OpenReviewDialog(MyRating))" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">Admin Delete</MudButton>
+                                </MudCardActions>
+                            </AuthorizeView>
+                        </MudCard>
+                    }
+                }
+            }
+        }
+    </MudContainer>
+</CascadingAuthenticationState>
+
+
+@code {
+    [Parameter]
+    public int MovieId { get; set; }
+
+    private Movie? Movie;
+    private Rating? MyRating = null;
+    private List<Rating> OtherRatings = new();
+    
+    private ClaimsPrincipal? User;
+    private string? UserId;
+
+    [CascadingParameter]
+    public required Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        User = authState.User;
+
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        }
+
+        await LoadMovieData();
+    }
+
+    private async Task LoadMovieData()
+    {
+        Movie = await ApplicationDbContext.Movies
+            .Include(m => m.PosterImage)
+            .Include(m => m.Ratings)
+                .ThenInclude(r => r.User)
+            .Include(m => m.MovieActors)
+                .ThenInclude(ma => ma.Actor)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Id == MovieId);
+
+        if (Movie != null)
+        {
+            if (UserId != null)
+            {
+                MyRating = Movie.Ratings.FirstOrDefault(r => r.UserId == UserId);
+                OtherRatings = Movie.Ratings.Where(r => r.UserId != UserId).ToList();
+            }
+            else
+            {
+                OtherRatings = Movie.Ratings.ToList();
+            }
+        }
+    }
+
+    private async Task OpenReviewDialog(Rating? editedRating)
+    {
+        var parameters = new DialogParameters();
+        Rating ratingModel;
+
+        if (editedRating == null)
+        {
+            ratingModel = new Rating
+            {
+                MovieId = this.MovieId,
+                UserId = this.UserId ?? throw new InvalidOperationException("Invalid branch - UserId null when creating review."),
+                Points = 5
+            };
+            parameters.Add("RatingModel", ratingModel);
+            parameters.Add("EditingExisting", false);
+        }
+        else
+        {
+            ratingModel =
+                await ApplicationDbContext.Ratings.FindAsync(editedRating.MovieId, editedRating.UserId)
+                ?? throw new InvalidOperationException("Invalid branch - edited rating not found in DB.");
+            parameters.Add("RatingModel", ratingModel);
+            parameters.Add("EditingExisting", true);
+        }
+
+        var dialog = await DialogService.ShowAsync<ReviewFormDialog>("Review", parameters);
+        var result = await dialog.Result;
+        if (!(result?.Canceled ?? false)) {
+            await LoadMovieData();
+            StateHasChanged();
+        }
+    }
+
+    private async Task OpenMovieEditDialog()
+    {
+        var movieToEdit = await ApplicationDbContext.Movies
+            .Include(m => m.PosterImage)
+            .Include(m => m.MovieActors)
+            .FirstOrDefaultAsync(m => m.Id == MovieId);
+
+        if (movieToEdit == null)
+            throw new InvalidOperationException("Invalid branch - edited movie not found in DB.");
+
+        var parameters = new DialogParameters
+        {
+            { "MovieModel", movieToEdit },
+            { "IsNewMovie", false }
+        };
+
+        var dialog = await DialogService.ShowAsync<MovieFormDialog>("Edit Movie", parameters);
+        var result = await dialog.Result;
+        if (!(result?.Canceled ?? false)) {
+            await LoadMovieData();
+            StateHasChanged();
+        }
+    }
+}

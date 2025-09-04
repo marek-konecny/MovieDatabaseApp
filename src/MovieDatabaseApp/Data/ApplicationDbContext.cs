@@ -76,14 +76,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     protected void InitTestData(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Actor>().HasData(
-            new Actor { Id = 1, FullName = "Robert Downey Jr.", BirthDate = new DateOnly(1965, 4, 4) },
-            new Actor { Id = 2, FullName = "Chris Evans", BirthDate = new DateOnly(1981, 6, 13) }
-        );
-
         modelBuilder.Entity<Image>().HasData(
             new Image { Id = 1, Url = "https://image.pmgstatic.com/cache/resized/w280/files/images/film/posters/000/049/49177_031300.jpg" },
-            new Image { Id = 2, Url = "https://image.pmgstatic.com/cache/resized/w280/files/images/film/posters/159/533/159533397_612bbf.jpg" }
+            new Image { Id = 2, Url = "https://image.pmgstatic.com/cache/resized/w280/files/images/film/posters/159/533/159533397_612bbf.jpg" },
+            new Image { Id = 3, Url = "https://image.pmgstatic.com/cache/resized/w200h264crop/files/images/creator/photos/164/419/164419363_52de27.jpg" },
+            new Image { Id = 4, Url = "https://image.pmgstatic.com/cache/resized/w200h264crop/files/images/creator/photos/166/522/166522538_102f8e.jpg" }
+        );
+
+        modelBuilder.Entity<Actor>().HasData(
+            new Actor { Id = 1, FullName = "Robert Downey Jr.", BirthDate = new DateOnly(1965, 4, 4), PosterImageId = 3 },
+            new Actor { Id = 2, FullName = "Chris Evans", BirthDate = new DateOnly(1981, 6, 13), PosterImageId = 4 }
         );
 
         modelBuilder.Entity<Movie>().HasData(

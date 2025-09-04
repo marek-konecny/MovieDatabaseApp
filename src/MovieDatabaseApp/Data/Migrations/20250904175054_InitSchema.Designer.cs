@@ -12,7 +12,7 @@ using MovieDatabaseApp.Data;
 namespace MovieDatabaseApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250903184215_InitSchema")]
+    [Migration("20250904175054_InitSchema")]
     partial class InitSchema
     {
         /// <inheritdoc />
@@ -279,7 +279,7 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.Property<int?>("PosterImageId")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("ReleaseDate")
+                    b.Property<DateOnly?>("ReleaseDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Title")
@@ -320,7 +320,6 @@ namespace MovieDatabaseApp.Data.Migrations
                         .HasColumnType("tinyint");
 
                     b.Property<string>("Text")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("TimestampCreated")

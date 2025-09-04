@@ -1,61 +1,100 @@
 ﻿@implements IDisposable
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using MovieDatabaseApp.Components.Account
+@using MovieDatabaseApp.Data
+@using System.Security.Claims
 
 @inject NavigationManager NavigationManager
 
-<MudNavMenu>
-
-    <!-- Hlavní odkazy -->
-    <MudNavLink Href="/" Match="NavLinkMatch.All">
-        <MudIcon Icon="@Icons.Material.Filled.Home" /> Home
-    </MudNavLink>
-
-    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix">
-        <MudIcon Icon="@Icons.Material.Filled.AddBox" /> Counter
-    </MudNavLink>
-
-    <MudNavLink Href="weather" Match="NavLinkMatch.Prefix">
-        <MudIcon Icon="@Icons.Material.Filled.List" /> Weather
-    </MudNavLink>
-
-    <MudNavLink Href="auth" Match="NavLinkMatch.Prefix">
-        <MudIcon Icon="@Icons.Material.Filled.Lock" /> Auth Required
-    </MudNavLink>
-
-    <!-- Autorizované odkazy -->
-    <AuthorizeView>
+<MudNavMenu class="d-flex gap-2" Rounded="true" Color="Color.Primary">
+    <MudNavLink Href="Movies" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Movie">Movies</MudNavLink>
+    <MudNavLink Href="Actors" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Stars">Actors</MudNavLink>
+    <AuthorizeView Roles="Admin">
         <Authorized>
-            <MudNavGroup Title="@context.User.Identity?.Name" Icon="@Icons.Material.Filled.Person" Expanded="true">
-                <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix">Account</MudNavLink>
-                <MudNavLink Href="Account/Logout" Match="NavLinkMatch.Prefix">
-                    <form method="post">
+            <MudNavLink Href="Profiles" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.SupervisedUserCircle">Users</MudNavLink>
+        </Authorized>
+
+
+        <Authorized>
+            <MudMenu>
+                <ActivatorContent>
+                    @if (profileImageUrl is not null)
+                    {
+                        <MudImage Src="@profileImageUrl" />
+                    }
+                    else
+                    {
+                        <MudAvatar Variant="Variant.Outlined">
+                            <MudIcon Icon="@Icons.Material.Filled.Person" />
+                        </MudAvatar>
+                    }
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Person" Href="Account/Manage" Label="Manage Profile" />
+                    <form action="Account/Logout" method="post">
                         <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="@NavigationManager.Uri" />
-                        <button type="submit" class="mud-button mud-button-text">
-                            <MudIcon Icon="@Icons.Material.Filled.ExitToApp" /> Logout
+                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                        <button type="submit" class="mud-nav-link mud-ripple">
+                            <MudIcon Icon="@Icons.Material.Filled.Logout" Class="mr-3"></MudIcon> Logout
                         </button>
                     </form>
-                </MudNavLink>
-            </MudNavGroup>
+                </ChildContent>
+            </MudMenu>
         </Authorized>
         <NotAuthorized>
-            <MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix">
-                <MudIcon Icon="@Icons.Material.Filled.PersonAdd" /> Register
-            </MudNavLink>
-            <MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix">
-                <MudIcon Icon="@Icons.Material.Filled.Login" /> Login
-            </MudNavLink>
+            <MudMenu>
+                <ActivatorContent>
+                    <MudAvatar Variant="Variant.Outlined">
+                        <MudIcon Icon="@Icons.Material.Filled.Person" />
+                    </MudAvatar>
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Password" Href="Account/Login" Label="Login" />
+                    <MudMenuItem Icon="@Icons.Material.Filled.Person" Href="Account/Register" Label="Register" />
+                </ChildContent>
+            </MudMenu>
         </NotAuthorized>
     </AuthorizeView>
 
+
 </MudNavMenu>
+
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ApplicationDbContext ApplicationDbContext
 
 @code {
     private string? currentUrl;
 
-    protected override void OnInitialized()
+    private string? profileImageUrl = null;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+
+    protected override async Task OnInitializedAsync()
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
+
+        @* var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId != null)
+        {
+            Console.WriteLine("User ID: " + userId);
+            var userProfile = await ApplicationDbContext.UserProfiles
+                .Include(up => up.ProfileImage)
+                .FirstOrDefaultAsync(up => up.UserId == userId);
+
+            Console.WriteLine(userProfile == null ? "User profile not found." : "User profile found.");
+            Console.WriteLine(userProfile?.ToString());
+            Console.WriteLine(userProfile?.ProfileImage?.ToString());
+            profileImageUrl = userProfile?.ProfileImage?.Url;
+        } *@
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
@@ -68,5 +107,6 @@
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
+
 }
 

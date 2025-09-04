@@ -1,0 +1,133 @@
+@page "/Actors/{ActorId:int}"
+@using MovieDatabaseApp.Data
+@using MovieDatabaseApp.Data.Models
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Authorization
+@using MovieDatabaseApp.Components.Actors.Shared
+@inject ApplicationDbContext ApplicationDbContext
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+
+<PageTitle>@Actor?.FullName</PageTitle>
+
+<CascadingAuthenticationState>
+    <MudContainer MaxWidth="MaxWidth.Medium">
+        @if (Actor == null)
+        {
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+        }
+        else
+        {
+            <MudPaper Class="pa-8">
+                <MudGrid>
+                    <MudItem xs="12" sm="4">
+                        @if (Actor.PosterImage?.Url != null)
+                        {
+                            <MudImage Class="rounded" Src="@Actor.PosterImage.Url" Fluid />
+                        }
+                        else
+                        {
+                            <MudPaper Height="100%" Class="d-flex align-center justify-center bg-light" Elevation="0">
+                                <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Dark" Size="Size.Large" />
+                            </MudPaper>
+                        }
+                    </MudItem>
+                    <MudItem xs="12" sm="8">
+                        <MudText Typo="Typo.h4" GutterBottom="true">@Actor.FullName</MudText>
+                        
+                        <MudText Typo="Typo.subtitle1" Class="mb-4">Born: @Actor.BirthDate.ToString()</MudText>
+
+
+                        @if (StarredInMoviesByYear?.Any() == true)
+                        {
+                            <MudText Typo="Typo.h6" GutterBottom="true">Starred in</MudText>
+                            
+                            <MudList T="MovieActor">
+                                @foreach (var yearGroup in StarredInMoviesByYear)
+                                {
+                                    <MudListItem Text="@yearGroup.Key.ToString()" Expanded Class="py-1 border-b border-dotted" >
+                                        <NestedList>
+                                            @foreach (var movieActor in yearGroup)
+                                            {
+                                                <MudListItem Href="@($"/Movies/{movieActor.MovieId}")" Text="@movieActor.Movie.Title" />
+                                            }
+                                        </NestedList>
+                                    </MudListItem>
+                                }
+                            </MudList>
+                            
+                        }
+                    </MudItem>
+                </MudGrid>
+
+                <AuthorizeView Roles="Admin">
+                    <MudButton Color="Color.Primary" OnClick="OpenActorEditDialog" Class="mt-4" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">
+                        Admin Edit Actor
+                    </MudButton>
+                </AuthorizeView>
+            </MudPaper>
+        }
+    </MudContainer>
+</CascadingAuthenticationState>
+
+
+@code {
+    [Parameter]
+    public int ActorId { get; set; }
+
+    private Actor? Actor;
+
+    private IEnumerable<IGrouping<int, MovieActor>>? StarredInMoviesByYear;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadActorData();
+    }
+
+    private async Task LoadActorData()
+    {
+        var trackedEntries = ApplicationDbContext.ChangeTracker.Entries().ToList();
+        foreach (var entry in trackedEntries)
+        {
+            entry.State = EntityState.Detached;
+        }
+
+        Actor = await ApplicationDbContext.Actors
+            .Include(a => a.PosterImage)
+            .Include(a => a.MovieActors)
+                .ThenInclude(ma => ma.Movie) 
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == ActorId);
+
+        if (Actor?.MovieActors?.Any() == true)
+        {
+            StarredInMoviesByYear = Actor.MovieActors
+                .Where(ma => ma.Movie?.ReleaseDate != null)
+                .GroupBy(ma => ma.Movie!.ReleaseDate!.Value.Year)
+                .OrderByDescending(g => g.Key);
+        }
+    }
+
+    private async Task OpenActorEditDialog()
+    {
+        var actorToEdit = await ApplicationDbContext.Actors
+            .Include(a => a.PosterImage)
+            .Include(a => a.MovieActors)
+            .FirstOrDefaultAsync(a => a.Id == ActorId);
+
+        if (actorToEdit == null) return;
+
+        var parameters = new DialogParameters
+        {
+            { "ActorModel", actorToEdit },
+            { "IsNewActor", false }
+        };
+
+        var dialog = await DialogService.ShowAsync<ActorFormDialog>("Edit Actor", parameters);
+        var result = await dialog.Result;
+        if (!(result?.Canceled ?? false)) {
+            await LoadActorData();
+            StateHasChanged();
+        }
+    }
+}

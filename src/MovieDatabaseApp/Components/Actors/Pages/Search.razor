@@ -1,0 +1,134 @@
+@page "/Actors"
+@using MovieDatabaseApp.Data
+@using MovieDatabaseApp.Data.Models
+@using Microsoft.EntityFrameworkCore
+@using MovieDatabaseApp.Components.Actors.Shared
+@inject ApplicationDbContext ApplicationDbContext
+@inject IDialogService DialogService
+
+<PageTitle>Actor Search</PageTitle>
+
+<AuthorizeView Roles="Admin">
+    <div class="d-flex justify-content-end">
+    <MudSpacer />
+    <MudButton Color="Color.Primary" OnClick="OpenAddActorDialog" Class="ml-auto" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">
+        Admin Add Actor
+    </MudButton>
+    </div>
+</AuthorizeView>
+
+<MudDataGrid @ref="dataGrid" T="Actor" ServerData="LoadActors" Filterable="false" Elevation="0">
+    <ToolBarContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">Actors</MudText>
+        <MudSpacer />
+        <MudTextField
+            T="string" ValueChanged="@(s => OnSearch(s))" Placeholder="Search by Name"
+            Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Clearable="true"
+        />
+    </ToolBarContent>
+    <Columns>
+        <TemplateColumn Sortable="false">
+            <CellTemplate>
+                @if (context.Item.PosterImage?.Url != null)
+                {
+                    <MudImage Class="rounded-sm bg-light" Src="@context.Item.PosterImage.Url" Width="75" Fluid />
+                }
+                else
+                {
+                    <MudPaper Width="75" Class="d-flex align-center justify-center bg-light" Elevation="0">
+                        <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Color="Color.Dark" />
+                    </MudPaper>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+
+        <PropertyColumn Property="x => x.FullName" Title="Full Name">
+            <CellTemplate>
+                <MudLink Href="@($"/Actors/{context.Item.Id}")">@context.Item.FullName</MudLink>
+            </CellTemplate>
+        </PropertyColumn>
+
+        <PropertyColumn Property="x => x.BirthDate" Title="Birth Date" Format="d" Sortable="true" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Actor" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private MudDataGrid<Actor>? dataGrid;
+    private string searchString = string.Empty;
+
+    private async Task<GridData<Actor>> LoadActors(GridState<Actor> state)
+    {
+        IQueryable<Actor> query = ApplicationDbContext.Actors
+            .Include(a => a.PosterImage)
+            .Include(a => a.MovieActors);
+
+        if (!string.IsNullOrWhiteSpace(searchString))
+        {
+            query = query.Where(a => a.FullName.ToLower().Contains(searchString.ToLower()));
+        }
+
+        var totalItems = await query.CountAsync();
+
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        if (sortDefinition != null)
+        {
+            switch (sortDefinition.SortBy)
+            {
+                case nameof(Actor.FullName):
+                    query = sortDefinition.Descending
+                        ? query.OrderByDescending(a => a.FullName)
+                        : query.OrderBy(a => a.FullName);
+                    break;
+                case nameof(Actor.BirthDate):
+                    query = sortDefinition.Descending
+                        ? query.OrderByDescending(a => a.BirthDate)
+                        : query.OrderBy(a => a.BirthDate);
+                    break;
+            }
+        }
+
+        var pagedData = await query
+            .Skip(state.Page * state.PageSize)
+            .Take(state.PageSize)
+            .ToListAsync();
+
+        return new GridData<Actor>
+        {
+            TotalItems = totalItems,
+            Items = pagedData
+        };
+    }
+
+    private Task OnSearch(string text)
+    {
+        searchString = text;
+        return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
+    }
+
+    private async Task OpenAddActorDialog()
+    {
+        var parameters = new DialogParameters
+        {
+            { "ActorModel", new Actor
+                { 
+                    FullName = string.Empty, 
+                    BirthDate = DateOnly.FromDateTime(DateTime.Today) 
+                }
+            },
+            { "IsNewActor", true }
+        };
+
+        var dialog = await DialogService.ShowAsync<ActorFormDialog>("Add Actor", parameters);
+        var result = await dialog.Result;
+        if (!(result?.Canceled ?? false))
+        {
+            if (dataGrid != null)
+            {
+                await dataGrid.ReloadServerData();
+            }
+        }
+    }
+}

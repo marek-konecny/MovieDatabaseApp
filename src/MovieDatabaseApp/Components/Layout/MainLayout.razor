@@ -5,17 +5,25 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-
 <MudLayout>
-    <MudAppBar>
-        MovieDatabaseApp
+    <MudPaper Class="d-flex pa-4" Square="true" Outlined="true">
+        <h1>MovieDatabaseApp</h1>
+        <MudSpacer />
         <NavMenu />
-    </MudAppBar>
-    <MudMainContent>
+    </MudPaper>
+    <MudMainContent Class="pt-16 pa-4">
         @Body
     </MudMainContent>
 </MudLayout>
 
-@code {
 
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
 }
+
+

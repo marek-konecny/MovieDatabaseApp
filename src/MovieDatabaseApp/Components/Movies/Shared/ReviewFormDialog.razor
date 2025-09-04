@@ -1,0 +1,66 @@
+@using MovieDatabaseApp.Data
+@using MovieDatabaseApp.Data.Models
+@using Microsoft.EntityFrameworkCore
+@using MudBlazor
+
+@inject ApplicationDbContext DbContext
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">@(EditingExisting ? "Edit Review" : "Add Review")</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="form">
+            <MudText>Rating:</MudText>
+            <MudRating @bind-SelectedValue="RatingValueInt" MaxValue="10" />
+
+            <MudTextField @bind-Value="RatingModel.Text" Label="Review" Lines="5" Variant="Variant.Outlined" Class="mt-4" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    IMudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public required Rating RatingModel { get; set; }
+    [Parameter]
+    public bool EditingExisting { get; set; }
+
+
+    private int RatingValueInt
+    {
+        get => RatingModel.Points;
+        set => RatingModel.Points = (byte)value;
+    }
+
+    private MudForm? form;
+
+    private async Task Submit()
+    {
+        if (form == null) return;
+
+        await form.Validate();
+        if (!form.IsValid) return;
+
+        if (!EditingExisting)
+        {
+            Console.WriteLine("Adding new rating");
+            DbContext.Ratings.Add(RatingModel);
+        }
+        else
+        {
+            DbContext.Ratings.Update(RatingModel);
+        }
+
+        await DbContext.SaveChangesAsync();
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog.Cancel();
+}

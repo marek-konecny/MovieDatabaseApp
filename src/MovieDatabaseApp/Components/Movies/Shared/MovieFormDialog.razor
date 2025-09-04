@@ -1,0 +1,149 @@
+@using MovieDatabaseApp.Data
+@using MovieDatabaseApp.Data.Models
+@using Microsoft.EntityFrameworkCore
+@using MudBlazor
+
+@inject ApplicationDbContext DbContext
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">@(IsNewMovie ? "Add New Movie" : "Edit Movie")</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="form" Model="MovieModel" ValidationDelay="0">
+            <MudTextField @bind-Value="MovieModel.Title" Label="Title" For="() => MovieModel.Title" Required="true" />
+            
+            <MudDatePicker @bind-Date="ReleaseDateForPicker" Label="Release Date" Class="mt-4" />
+            
+            <MudTextField @bind-Value="PosterImageUrl" Label="Poster Image URL" Class="mt-4" />
+
+            <MudSelect
+                T="int" @bind-SelectedValues="SelectedActorIds" Label="Actors" MultiSelection="true" Class="mt-4" MultiSelectionTextFunc="GetMultiSelectionText">
+                @foreach (var actor in AllActors)
+                {
+                    <MudSelectItem T="int" Value="@actor.Id">@($"{actor.FullName}")</MudSelectItem>
+                }
+            </MudSelect>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    IMudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public required Movie MovieModel { get; set; }
+
+    [Parameter]
+    public bool IsNewMovie { get; set; }
+
+    private MudForm? form;
+    private string PosterImageUrl { get; set; } = "";
+
+    private List<Actor> AllActors { get; set; } = new();
+    private IEnumerable<int> SelectedActorIds { get; set; } = new List<int>();
+    
+    private DateTime? ReleaseDateForPicker
+    {
+        get => MovieModel.ReleaseDate?.ToDateTime(TimeOnly.MinValue);
+        set => MovieModel.ReleaseDate = value.HasValue ? DateOnly.FromDateTime(value.Value) : null;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AllActors = await DbContext.Actors
+            .OrderBy(a => a.FullName)
+            .ToListAsync();
+
+        if (MovieModel.PosterImage != null)
+        {
+            PosterImageUrl = MovieModel.PosterImage.Url;
+        }
+        
+        if (MovieModel.MovieActors.Any())
+        {
+            SelectedActorIds = MovieModel.MovieActors.Select(ma => ma.ActorId).ToList();
+        }
+    }
+
+    private string GetMultiSelectionText(List<string> _)
+    {
+        var selectedNames = SelectedActorIds
+            .Select(id => AllActors.FirstOrDefault(a => a.Id == id)?.FullName)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .ToList();
+
+        if (!selectedNames.Any())
+        {
+            return "";
+        }
+
+        return string.Join(", ", selectedNames.Take(1)) + (selectedNames.Count > 1 ? ", ..." : "");
+    }
+
+    private async Task Submit()
+    {
+        if (form == null) return;
+
+        await form.Validate();
+        if (!form.IsValid) return;
+        
+        if (!string.IsNullOrWhiteSpace(PosterImageUrl))
+        {
+            if (MovieModel.PosterImage == null || MovieModel.PosterImage.Url != PosterImageUrl)
+            {
+                var existingImage = await DbContext.Images.FirstOrDefaultAsync(i => i.Url == PosterImageUrl);
+                if (existingImage != null)
+                {
+                    MovieModel.PosterImage = existingImage;
+                }
+                else
+                {
+                    MovieModel.PosterImage = new Image { Url = PosterImageUrl };
+                }
+            }
+        }
+        else
+        {
+            MovieModel.PosterImage = null;
+            MovieModel.PosterImageId = null;
+        }
+
+        var currentActorIds = MovieModel.MovieActors.Select(ma => ma.ActorId).ToHashSet();
+        var selectedActorIdsSet = SelectedActorIds.ToHashSet();
+
+        // actor associations to remove
+        var movieActorsToRemove = MovieModel.MovieActors
+            .Where(ma => !selectedActorIdsSet.Contains(ma.ActorId))
+            .ToList();
+
+        // actor associations to add
+        var actorIdsToAdd = selectedActorIdsSet
+            .Where(id => !currentActorIds.Contains(id))
+            .ToList();
+
+        DbContext.MovieActors.RemoveRange(movieActorsToRemove);
+
+        foreach (var actorId in actorIdsToAdd)
+            MovieModel.MovieActors.Add(new MovieActor { ActorId = actorId });
+
+        if (IsNewMovie)
+        {
+            DbContext.Movies.Add(MovieModel);
+        }
+        else
+        {
+            DbContext.Movies.Update(MovieModel);
+        }
+
+        await DbContext.SaveChangesAsync();
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog.Cancel();
+}

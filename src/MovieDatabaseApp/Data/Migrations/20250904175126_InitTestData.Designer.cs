@@ -12,7 +12,7 @@ using MovieDatabaseApp.Data;
 namespace MovieDatabaseApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250903184252_InitTestData")]
+    [Migration("20250904175126_InitTestData")]
     partial class InitTestData
     {
         /// <inheritdoc />
@@ -269,13 +269,15 @@ namespace MovieDatabaseApp.Data.Migrations
                         {
                             Id = 1,
                             BirthDate = new DateOnly(1965, 4, 4),
-                            FullName = "Robert Downey Jr."
+                            FullName = "Robert Downey Jr.",
+                            PosterImageId = 3
                         },
                         new
                         {
                             Id = 2,
                             BirthDate = new DateOnly(1981, 6, 13),
-                            FullName = "Chris Evans"
+                            FullName = "Chris Evans",
+                            PosterImageId = 4
                         });
                 });
 
@@ -305,6 +307,16 @@ namespace MovieDatabaseApp.Data.Migrations
                         {
                             Id = 2,
                             Url = "https://image.pmgstatic.com/cache/resized/w280/files/images/film/posters/159/533/159533397_612bbf.jpg"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Url = "https://image.pmgstatic.com/cache/resized/w200h264crop/files/images/creator/photos/164/419/164419363_52de27.jpg"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Url = "https://image.pmgstatic.com/cache/resized/w200h264crop/files/images/creator/photos/166/522/166522538_102f8e.jpg"
                         });
                 });
 
@@ -319,7 +331,7 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.Property<int?>("PosterImageId")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("ReleaseDate")
+                    b.Property<DateOnly?>("ReleaseDate")
                         .HasColumnType("date");
 
                     b.Property<string>("Title")
@@ -388,7 +400,6 @@ namespace MovieDatabaseApp.Data.Migrations
                         .HasColumnType("tinyint");
 
                     b.Property<string>("Text")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("TimestampCreated")

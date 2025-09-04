@@ -14,21 +14,23 @@ namespace MovieDatabaseApp.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.InsertData(
-                table: "Actors",
-                columns: new[] { "Id", "BirthDate", "FullName", "PosterImageId" },
-                values: new object[,]
-                {
-                    { 1, new DateOnly(1965, 4, 4), "Robert Downey Jr.", null },
-                    { 2, new DateOnly(1981, 6, 13), "Chris Evans", null }
-                });
-
-            migrationBuilder.InsertData(
                 table: "Images",
                 columns: new[] { "Id", "Url" },
                 values: new object[,]
                 {
                     { 1, "https://image.pmgstatic.com/cache/resized/w280/files/images/film/posters/000/049/49177_031300.jpg" },
-                    { 2, "https://image.pmgstatic.com/cache/resized/w280/files/images/film/posters/159/533/159533397_612bbf.jpg" }
+                    { 2, "https://image.pmgstatic.com/cache/resized/w280/files/images/film/posters/159/533/159533397_612bbf.jpg" },
+                    { 3, "https://image.pmgstatic.com/cache/resized/w200h264crop/files/images/creator/photos/164/419/164419363_52de27.jpg" },
+                    { 4, "https://image.pmgstatic.com/cache/resized/w200h264crop/files/images/creator/photos/166/522/166522538_102f8e.jpg" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Actors",
+                columns: new[] { "Id", "BirthDate", "FullName", "PosterImageId" },
+                values: new object[,]
+                {
+                    { 1, new DateOnly(1965, 4, 4), "Robert Downey Jr.", 3 },
+                    { 2, new DateOnly(1981, 6, 13), "Chris Evans", 4 }
                 });
 
             migrationBuilder.InsertData(
@@ -92,6 +94,16 @@ namespace MovieDatabaseApp.Data.Migrations
                 table: "Images",
                 keyColumn: "Id",
                 keyValue: 2);
+
+            migrationBuilder.DeleteData(
+                table: "Images",
+                keyColumn: "Id",
+                keyValue: 3);
+
+            migrationBuilder.DeleteData(
+                table: "Images",
+                keyColumn: "Id",
+                keyValue: 4);
         }
     }
 }

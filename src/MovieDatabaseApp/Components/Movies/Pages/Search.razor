@@ -1,0 +1,159 @@
+@page "/Movies"
+@page "/"
+@using MovieDatabaseApp.Data
+@using MovieDatabaseApp.Data.Models
+@using Microsoft.EntityFrameworkCore
+@using MovieDatabaseApp.Components.Movies.Shared
+
+@inject NavigationManager NavigationManager
+@inject ApplicationDbContext ApplicationDbContext
+@inject IDialogService DialogService
+
+<PageTitle>Movie Search</PageTitle>
+
+<AuthorizeView Roles="Admin">
+    <div class="d-flex justify-content-end">
+    <MudSpacer />
+    <MudButton Color="Color.Primary" OnClick="OpenAddMovieDialog" Class="ml-auto" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">
+        Admin Add Movie
+    </MudButton>
+    </div>
+</AuthorizeView>
+
+<MudDataGrid @ref="dataGrid" T="Movie" ServerData="NewQuery" Filterable="false" Elevation="0"> 
+    <ToolBarContent>
+        <MudText Typo="Typo.h5" GutterBottom="true">Movies</MudText>
+        <MudSpacer />
+        <MudTextField
+            T="string" ValueChanged="@(s => OnSearch(s))" Placeholder="Search by Title"
+            Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" Clearable="true"
+        />
+    </ToolBarContent>
+    <Columns>    
+        <TemplateColumn Sortable="false">
+            <CellTemplate>
+                @if (context.Item.PosterImage?.Url != null)
+                {
+                    <MudImage Class="bg-light" Src="@context.Item.PosterImage.Url" Width="100" Fluid />
+                }
+                else
+                {
+                    <MudPaper Class="d-flex align-center justify-center bg-light" Elevation="0" >
+                    <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Color="Color.Dark" />
+                    </MudPaper>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Title" Title="Title">
+            <CellTemplate>
+                <MudLink Href="@($"/Movies/{context.Item.Id}")">@context.Item.Title</MudLink>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.ReleaseDate" Title="Release Date" Format="d" Sortable="true" />
+        
+        <TemplateColumn Title="Rating" Sortable="false">
+            <CellTemplate>
+                @if (context.Item.Ratings != null && context.Item.Ratings.Any())
+                {
+                    <MudText Typo="Typo.body2">
+                        @((context.Item.Ratings.Average(r => r.Points) * 10).ToString("0"))%
+                    </MudText>
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Small" />
+                }
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Movie" />
+    </PagerContent>
+</MudDataGrid>
+
+
+@code {
+    private MudDataGrid<Movie>? dataGrid;
+    private string searchString = string.Empty;
+
+
+    protected override void OnInitialized()
+    {
+        // redirect to /Movies if on root
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (uri.AbsolutePath == "/")
+            NavigationManager.NavigateTo("/Movies");
+    }
+
+
+    private async Task<GridData<Movie>> NewQuery(GridState<Movie> state)
+    {
+        IQueryable<Movie> query = ApplicationDbContext.Movies
+            .Include(m => m.PosterImage)
+            .Include(m => m.Ratings); 
+
+        if (!string.IsNullOrWhiteSpace(searchString))
+            query = query.Where(m => m.Title.ToLower().Contains(searchString.ToLower()));
+
+        var totalItems = await query.CountAsync();
+
+        var sortDefinition = state.SortDefinitions.FirstOrDefault();
+        if (sortDefinition != null)
+        {
+            switch (sortDefinition.SortBy)
+            {
+                case nameof(Movie.Id):
+                    query = sortDefinition.Descending
+                        ? query.OrderByDescending(m => m.Id)
+                        : query.OrderBy(m => m.Id);
+                    break;
+                case nameof(Movie.Title):
+                    query = sortDefinition.Descending
+                        ? query.OrderByDescending(m => m.Title)
+                        : query.OrderBy(m => m.Title);
+                    break;
+                case nameof(Movie.ReleaseDate):
+                    query = sortDefinition.Descending
+                        ? query.OrderByDescending(m => m.ReleaseDate)
+                        : query.OrderBy(m => m.ReleaseDate);
+                    break;
+            }
+        }
+
+        var pagedData = await query
+            .Skip(state.Page * state.PageSize)
+            .Take(state.PageSize)
+            .ToListAsync();
+
+        return new GridData<Movie>
+        {
+            TotalItems = totalItems,
+            Items = pagedData
+        };
+    }
+
+    private Task OnSearch(string text)
+    {
+        searchString = text;
+        return dataGrid?.ReloadServerData() ?? Task.CompletedTask;
+    }
+
+    private async Task OpenAddMovieDialog()
+    {
+        var parameters = new DialogParameters
+        {
+            { "MovieModel", new Movie { Title = string.Empty, ReleaseDate = DateOnly.FromDateTime(DateTime.Today) } },
+            { "IsNewMovie", true }
+        };
+
+        var dialog = await DialogService.ShowAsync<MovieFormDialog>("Add New Movie", parameters);
+        var result = await dialog.Result;
+        if (!(result?.Canceled ?? false))
+        {
+            if (dataGrid != null)
+            {
+                await dataGrid.ReloadServerData();
+            }
+        }
+    }
+}

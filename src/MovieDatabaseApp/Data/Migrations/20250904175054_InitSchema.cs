@@ -197,7 +197,7 @@ namespace MovieDatabaseApp.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReleaseDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    ReleaseDate = table.Column<DateOnly>(type: "date", nullable: true),
                     PosterImageId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -264,7 +264,7 @@ namespace MovieDatabaseApp.Data.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     MovieId = table.Column<int>(type: "int", nullable: false),
                     Points = table.Column<byte>(type: "tinyint", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TimestampCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TimestampEdited = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },

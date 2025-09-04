@@ -1,0 +1,38 @@
+@using MudBlazor
+
+<MudStack Row="true" Spacing="0">
+    @for (int i = 1; i <= MaxStars; i++)
+    {
+        @if (i <= Math.Floor(GetRatingValueNormalizedFloat()))
+        {
+            <MudIcon Icon="@Icons.Material.Filled.Star" Color="Color.Warning" Size="Size.Small" />
+        }
+        else if (i - 0.5f <= GetRatingValueNormalizedFloat())
+        {
+            <MudIcon Icon="@Icons.Material.Filled.StarHalf" Color="Color.Warning" Size="Size.Small" />
+        }
+        else
+        {
+            <MudIcon Icon="@Icons.Material.Filled.StarBorder" Color="Color.Warning" Size="Size.Small" />
+        }
+    }
+</MudStack>
+
+@code {
+    [Parameter]
+    public byte RatingValue { get; set; }
+
+    [Parameter]
+    public byte RatingValueMax { get; set; } = 10;
+    [Parameter]
+    public int MaxStars { get; set; } = 5;
+
+    private float GetRatingValueNormalizedFloat()
+    {
+        if (RatingValueMax == 0) return 0f;
+
+        float normalized = (float)RatingValue / RatingValueMax * MaxStars;
+        
+        return Math.Clamp(normalized, 0f, (float)MaxStars);
+    }
+}
