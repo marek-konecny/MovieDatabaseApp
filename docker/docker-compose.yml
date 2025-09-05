@@ -36,8 +36,6 @@ services:
       - "./nginx/templates:/etc/nginx/templates/"
     environment:
       APP_INTERNAL_PORT: "${APP_INTERNAL_PORT}"
-    depends_on:
-      - moviedatabaseapp
     networks:
       - movie-database-app-bridge
 
