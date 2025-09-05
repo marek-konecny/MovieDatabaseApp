@@ -1,27 +1,43 @@
 services:
   database:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: MovieDatabaseAppDB
+    build:
+      context: ./db
+    container_name: ${COMPOSE_PROJECT_NAME}-db
     environment:
-      SA_PASSWORD: "adminHesl0-"
+      SA_PASSWORD: "${DB_SA_PASSWORD}"
       ACCEPT_EULA: "Y"
+    volumes:
+      - ./db/scripts:/docker-entrypoint-initdb.d
     ports:
-      - "1433:1433"
-    # I decided to use .NET migrations instead
-    # volumes:
-    #  - ./db/scripts:/docker-entrypoint-initdb.d
+      - "${DB_PORT}:1433"
     networks:
       - movie-database-app-bridge
 
   moviedatabaseapp:
     build:
       context: ../src/MovieDatabaseApp
-    ports:
-      - "5000:5000"
+    container_name: ${COMPOSE_PROJECT_NAME}-app
+    expose:
+      - "${APP_INTERNAL_PORT}"
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=database;Database=MovieDatabaseDb;User Id=sa;Password=${DB_SA_PASSWORD};TrustServerCertificate=True;"
+      ASPNETCORE_URLS: "http://+:${APP_INTERNAL_PORT}"
     depends_on:
       - database
+    networks:
+      - movie-database-app-bridge
+
+  nginx:
+    image: nginx:alpine
+    container_name: ${COMPOSE_PROJECT_NAME}-proxy
+    ports:
+      - "${NGINX_PORT}:80"
+    volumes:
+      - "./nginx/templates:/etc/nginx/templates/"
     environment:
-      ConnectionStrings__DefaultConnection: "Server=database;Database=MovieDatabaseDb;User Id=sa;Password=adminHesl0-;TrustServerCertificate=True;"
+      APP_INTERNAL_PORT: "${APP_INTERNAL_PORT}"
+    depends_on:
+      - moviedatabaseapp
     networks:
       - movie-database-app-bridge
 
