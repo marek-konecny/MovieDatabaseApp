@@ -31,7 +31,7 @@ APP_INTERNAL_PORT=5000
 Initially I planned to use code-first .NET database migrations.
 These however, turned out to be problematic as I yet have to find a way to properly check and wait for
 a healthy database state before deploying the migrations.
-As of now, the initial schema / seed migration is handled by generated .SQL script.
+As of now, the initial schema / seed migration is handled by generated .SQL script and fixed wait time.
 
 ## Deployment
 

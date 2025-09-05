@@ -11,36 +11,36 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IDbContextFactory<ApplicationDbContext> DbContextFactory
 
-<MudNavMenu class="d-flex gap-2" Rounded="true" Color="Color.Primary">
-    <MudNavLink Href="Movies" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Movie">Movies</MudNavLink>
-    <MudNavLink Href="Actors" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Stars">Actors</MudNavLink>
-    
-    <AuthorizeView>
-        <Authorized>
-            @* <AuthorizeView Roles="Admin">
-                <Authorized Context="adminContext">
-                    <MudNavLink Href="Profiles" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonSearch">Users</MudNavLink>
-                </Authorized>
-            </AuthorizeView> *@
-
-            <div class="ml-7 d-flex gap-2">
-                <MudNavLink Icon="@Icons.Material.Rounded.Person" Href="Account/Manage" Match="NavLinkMatch.Prefix">Account</MudNavLink>
-                    
-                <form action="Account/Logout" method="post">
-                    <AntiforgeryToken />
-                    <input type="hidden" name="ReturnUrl" value="@currentUrl"/>
-                    <button type="submit" class="mud-nav-link mud-ripple"><MudIcon Icon="@Icons.Material.Outlined.Logout"/></button>
-                </form>
-            </div>
-        </Authorized>
-        <NotAuthorized>
-            <div class="ml-7 d-flex gap-2">
-                <MudNavLink Href="Account/Login" Icon="@Icons.Material.Filled.Password" Match="NavLinkMatch.Prefix">Login</MudNavLink>
-                <MudNavLink Href="Account/Register" Icon="@Icons.Material.Filled.Person" Match="NavLinkMatch.Prefix">Register</MudNavLink>
-            </div>
-        </NotAuthorized>
-    </AuthorizeView>
-</MudNavMenu>
+<MudNavMenu class="d-flex gap-2" Rounded="true" Color="Color.Primary"> 
+    <MudNavLink Href="Movies" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Movie">Movies</MudNavLink> 
+    <MudNavLink Href="Actors" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Stars">Actors</MudNavLink> 
+     
+    <AuthorizeView> 
+        <Authorized> 
+            @* <AuthorizeView Roles="Admin"> 
+                <Authorized Context="adminContext"> 
+                    <MudNavLink Href="Profiles" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonSearch">Users</MudNavLink> 
+                </Authorized> 
+            </AuthorizeView> *@ 
+ 
+            <div class="ml-7 d-flex gap-2"> 
+                <MudNavLink Icon="@Icons.Material.Rounded.Person" Href="Account/Manage" Match="NavLinkMatch.Prefix">Account</MudNavLink> 
+                     
+                <form action="Account/Logout" method="post"> 
+                    <AntiforgeryToken /> 
+                    <input type="hidden" name="ReturnUrl" value="@currentUrl"/> 
+                    <button type="submit" class="mud-nav-link mud-ripple"><MudIcon Icon="@Icons.Material.Outlined.Logout"/></button> 
+                </form> 
+            </div> 
+        </Authorized> 
+        <NotAuthorized> 
+            <div class="ml-7 d-flex gap-2"> 
+                <MudNavLink Href="Account/Login" Icon="@Icons.Material.Filled.Password" Match="NavLinkMatch.Prefix">Login</MudNavLink> 
+                <MudNavLink Href="Account/Register" Icon="@Icons.Material.Filled.Person" Match="NavLinkMatch.Prefix">Register</MudNavLink> 
+            </div> 
+        </NotAuthorized> 
+    </AuthorizeView> 
+</MudNavMenu> 
 
 @code {
     private string? currentUrl;
