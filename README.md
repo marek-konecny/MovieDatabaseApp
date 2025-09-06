@@ -23,7 +23,7 @@ APP_INTERNAL_PORT=5000
 
 1. `cd docker`
 2. Supply appropriate `.env` script
-3. `docker-compose up --build database nginx`
+3. `docker-compose up --build database`
 4. `cd ../src/MovieDatabaseApp/`
 5. `dotnet watch`
 
