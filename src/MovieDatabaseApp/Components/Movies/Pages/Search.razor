@@ -1,4 +1,4 @@
-@page "/Movies"
+@page "/movies"
 @page "/"
 @using MovieDatabaseApp.Data
 @using MovieDatabaseApp.Data.Models
@@ -46,7 +46,7 @@
         </TemplateColumn>
         <PropertyColumn Property="x => x.Title" Title="Title">
             <CellTemplate>
-                <MudLink Href="@($"/Movies/{context.Item.Id}")">@context.Item.Title</MudLink>
+                <MudLink Href="@($"/movies/{context.Item.Id}")">@context.Item.Title</MudLink>
             </CellTemplate>
         </PropertyColumn>
         <PropertyColumn Property="x => x.ReleaseDate" Title="Release Date" Format="d" Sortable="true" />
@@ -79,10 +79,10 @@
 
     protected override void OnInitialized()
     {
-        // redirect to /Movies if on root
+        // redirect to /movies if on root
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
         if (uri.AbsolutePath == "/")
-            NavigationManager.NavigateTo("/Movies");
+            NavigationManager.NavigateTo("/movies");
     }
 
 

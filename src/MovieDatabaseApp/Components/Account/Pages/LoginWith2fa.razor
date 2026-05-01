@@ -1,4 +1,4 @@
-﻿@page "/Account/LoginWith2fa"
+﻿@page "/account/login-with-2fa"
 
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Identity
@@ -41,7 +41,7 @@
 </div>
 <p>
     Don't have access to your authenticator device? You can
-    <a class="mud-link mud-primary-text mud-link-underline-hover" href="Account/LoginWithRecoveryCode?ReturnUrl=@ReturnUrl">log in with a recovery code</a>.
+    <a class="mud-link mud-primary-text mud-link-underline-hover" href="account//login-with-recovery-code?ReturnUrl=@ReturnUrl">log in with a recovery code</a>.
 </p>
 
 @code {
@@ -78,7 +78,7 @@
         else if (result.IsLockedOut)
         {
             Logger.LogWarning("User with ID '{UserId}' account locked out.", userId);
-            RedirectManager.RedirectTo("Account/Lockout");
+            RedirectManager.RedirectTo("account/lockout");
         }
         else
         {

@@ -1,4 +1,4 @@
-﻿@page "/Account/Manage/TwoFactorAuthentication"
+﻿@page "/account/manage/two-factor-authentication"
 
 @using Microsoft.AspNetCore.Http.Features
 @using Microsoft.AspNetCore.Identity
@@ -24,7 +24,7 @@
             <MudAlert Variant="Variant.Text" Severity="Severity.Error">You have no recovery codes left.</MudAlert>
 
             <MudText Typo="Typo.body1" Class="pt-4">
-                You must <MudLink Href="Account/Manage/GenerateRecoveryCodes">generate a new set of recovery codes</MudLink>
+                You must <MudLink Href="account/manage/generate-recovery-codes">generate a new set of recovery codes</MudLink>
                 before you can log in with a recovery code.
             </MudText>
         }
@@ -33,7 +33,7 @@
             <MudAlert Variant="Variant.Text" Severity="Severity.Warning">You have 1 recovery code left.</MudAlert>
 
             <MudText Typo="Typo.body1" Class="pt-4">
-                You can <MudLink Href="Account/Manage/GenerateRecoveryCodes">generate a new set of recovery codes</MudLink>.
+                You can <MudLink Href="account/manage/generate-recovery-codes">generate a new set of recovery codes</MudLink>.
             </MudText>
         }
         else if (recoveryCodesLeft <= 3)
@@ -41,7 +41,7 @@
             <MudAlert Variant="Variant.Text" Severity="Severity.Warning">You have @recoveryCodesLeft recovery codes left.</MudAlert>
 
             <MudText Typo="Typo.body1" Class="pt-4">
-                You should <MudLink Href="Account/Manage/GenerateRecoveryCodes">generate a new set of recovery codes</MudLink>.
+                You should <MudLink Href="account/manage/generate-recovery-codes">generate a new set of recovery codes</MudLink>.
             </MudText>
         }
 
@@ -54,20 +54,20 @@
             </form>
         }
 
-        <MudLink Href="Account/Manage/Disable2fa">Disable 2FA</MudLink><br />
-        <MudLink Href="Account/Manage/GenerateRecoveryCodes">Reset recovery codes</MudLink>
+        <MudLink Href="account/manage/disable-2fa">Disable 2FA</MudLink><br />
+        <MudLink Href="account/manage/generate-recovery-codes">Reset recovery codes</MudLink>
     }
 
     <MudText Typo="Typo.h6" GutterBottom="true">Authenticator app</MudText>
 
     @if (!hasAuthenticator)
     {
-        <MudLink Href="Account/Manage/EnableAuthenticator">Add authenticator app</MudLink><br />
+        <MudLink Href="account/manage/enable-authenticator">Add authenticator app</MudLink><br />
     }
     else
     {
-        <MudLink Href="Account/Manage/EnableAuthenticator">Set up authenticator app</MudLink><br />
-        <MudLink Href="Account/Manage/ResetAuthenticator">Reset authenticator app</MudLink>
+        <MudLink Href="account/manage/enable-authenticator">Set up authenticator app</MudLink><br />
+        <MudLink Href="account/manage/reset-authenticator">Reset authenticator app</MudLink>
     }
 }
 else

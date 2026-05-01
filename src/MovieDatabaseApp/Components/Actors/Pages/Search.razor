@@ -1,4 +1,4 @@
-@page "/Actors"
+@page "/actors"
 @using MovieDatabaseApp.Data
 @using MovieDatabaseApp.Data.Models
 @using Microsoft.EntityFrameworkCore
@@ -44,7 +44,7 @@
 
         <PropertyColumn Property="x => x.FullName" Title="Full Name">
             <CellTemplate>
-                <MudLink Href="@($"/Actors/{context.Item.Id}")">@context.Item.FullName</MudLink>
+                <MudLink Href="@($"/actors/{context.Item.Id}")">@context.Item.FullName</MudLink>
             </CellTemplate>
         </PropertyColumn>
 

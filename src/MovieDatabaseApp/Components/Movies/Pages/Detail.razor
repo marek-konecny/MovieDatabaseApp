@@ -1,4 +1,4 @@
-@page "/Movies/{MovieId:int}"
+@page "/movies/{MovieId:int}"
 @using MovieDatabaseApp.Data
 @using MovieDatabaseApp.Data.Models
 @using Microsoft.EntityFrameworkCore
@@ -60,7 +60,7 @@
                             <MudPaper Square="true" Elevation="0" Class="d-flex flex-wrap gap-3">
                                 @foreach (var movieActor in Movie.MovieActors)
                                 {
-                                    <MudLink Href="@($"/Actors/{movieActor.ActorId}")">@movieActor.Actor.FullName</MudLink><br />
+                                    <MudLink Href="@($"/actors/{movieActor.ActorId}")">@movieActor.Actor.FullName</MudLink><br />
                                 }
                             </MudPaper>
                         }
@@ -111,7 +111,7 @@
                             <CardHeaderContent>
                                 <AuthorizeView>
                                     <Authorized>
-                                        <MudLink Href="@($"/Profile/{rating.UserId}")" Typo="Typo.subtitle2">@rating.User?.UserName</MudLink>
+                                        <MudLink Href="@($"/profile/{rating.UserId}")" Typo="Typo.subtitle2">@rating.User?.UserName</MudLink>
                                     </Authorized>
                                     <NotAuthorized>
                                         <MudText Typo="Typo.subtitle2">@rating.User?.UserName</MudText>

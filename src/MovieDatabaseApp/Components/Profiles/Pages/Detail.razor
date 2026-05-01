@@ -1,4 +1,4 @@
-@page "/Profile/{UserId}"
+@page "/profile/{UserId}"
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
 
@@ -51,7 +51,7 @@
             {
                 <ReviewCard Rating="rating">
                     <CardHeaderContent>
-                        <MudLink Href="@($"/Movies/{rating.MovieId}")" Typo="Typo.subtitle2">@rating.Movie.Title (@rating.Movie.ReleaseDate?.Year)</MudLink>
+                        <MudLink Href="@($"/movies/{rating.MovieId}")" Typo="Typo.subtitle2">@rating.Movie.Title (@rating.Movie.ReleaseDate?.Year)</MudLink>
                     </CardHeaderContent>
                 </ReviewCard>
             }

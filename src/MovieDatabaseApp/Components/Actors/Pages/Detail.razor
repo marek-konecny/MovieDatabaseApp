@@ -1,4 +1,4 @@
-@page "/Actors/{ActorId:int}"
+@page "/actors/{ActorId:int}"
 @using MovieDatabaseApp.Data
 @using MovieDatabaseApp.Data.Models
 @using Microsoft.EntityFrameworkCore
@@ -49,7 +49,7 @@
                                         <NestedList>
                                             @foreach (var movieActor in yearGroup)
                                             {
-                                                <MudListItem Href="@($"/Movies/{movieActor.MovieId}")" Text="@movieActor.Movie.Title" />
+                                                <MudListItem Href="@($"/movies/{movieActor.MovieId}")" Text="@movieActor.Movie.Title" />
                                             }
                                         </NestedList>
                                     </MudListItem>
