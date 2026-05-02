@@ -15,11 +15,6 @@
         </MudText>
     </MudItem>
     <MudItem md="12">
-        <MudAlert Severity="Severity.Warning" Variant="Variant.Text">
-            Deleting this data will permanently remove your account, and this cannot be recovered.
-        </MudAlert>
-    </MudItem>
-    <MudItem md="12">
         <form action="account/manage/download-personal-data" method="post">
             <AntiforgeryToken />
             <MudStaticButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Download</MudStaticButton>
@@ -27,6 +22,9 @@
     </MudItem>
     <MudItem md="12">
         <MudLink Href="account/manage/delete-personal-data" Color="Color.Error">Delete</MudLink>
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Text">
+            Deleting this data will permanently remove your account, and this cannot be recovered.
+        </MudAlert>
     </MudItem>
 </MudGrid>
 

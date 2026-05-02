@@ -5,6 +5,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
 @using MovieDatabaseApp.Components.Movies.Shared
+@using System.Runtime.CompilerServices
 @inject IDbContextFactory<ApplicationDbContext> DbContextFactory
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
@@ -98,7 +99,7 @@
                         </CardHeaderContent>
                         <CardActionsContent>
                             <MudButton Color="Color.Primary" OnClick="@(() => OpenReviewDialog(MyRating))" StartIcon="@Icons.Material.Filled.Edit" IconSize="Size.Small">Edit Review</MudButton>
-                            <MudButton Color="Color.Error" OnClick="@(() => OpenReviewDialog(MyRating))" StartIcon="@Icons.Material.Filled.Delete" IconSize="Size.Small">Delete</MudButton>
+                            <MudButton Color="Color.Error" OnClick="@(() => DeleteReview(MyRating, true))" StartIcon="@Icons.Material.Filled.Delete" IconSize="Size.Small">Delete</MudButton>
                         </CardActionsContent>
                     </ReviewCard>
                 }
@@ -120,7 +121,7 @@
                             </CardHeaderContent>
                             <CardActionsContent>
                                 <MudButton Color="Color.Primary" OnClick="@(() => OpenReviewDialog(rating))" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">Admin Edit</MudButton>
-                                <MudButton Color="Color.Error" OnClick="@(() => OpenReviewDialog(MyRating))" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">Admin Delete</MudButton>
+                                <MudButton Color="Color.Error" OnClick="@(() => DeleteReview(rating, false))" StartIcon="@Icons.Material.Filled.Shield" IconSize="Size.Small">Admin Delete</MudButton>
                             </CardActionsContent>
                         </ReviewCard>
                     }
@@ -242,6 +243,29 @@
         var result = await dialog.Result;
         if (!(result?.Canceled ?? false)) {
             await LoadMovieData();
+        }
+    }
+
+    private async Task DeleteReview(Rating ratingToDelete, bool ownsReview)
+    {
+        var confirm = await DialogService.ShowMessageBox(
+            title: null,
+            message: $"Are you sure you want to delete { (ownsReview ? "your" : "this") } review?",
+            yesText: "Delete",
+            noText: "Cancel",
+            options: new DialogOptions { }
+        );
+
+        if (confirm == true)
+        {
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            var rating = await dbContext.Ratings.FindAsync(ratingToDelete.MovieId, ratingToDelete.UserId);
+            if (rating != null)
+            {
+                dbContext.Ratings.Remove(rating);
+                await dbContext.SaveChangesAsync();
+                await LoadMovieData();
+            }
         }
     }
 }
