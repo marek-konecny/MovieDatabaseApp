@@ -1,15 +1,25 @@
 services:
   database:
-    build:
-      context: ./db
+    image: postgres:15-alpine
     container_name: ${COMPOSE_PROJECT_NAME}-db
     environment:
-      SA_PASSWORD: "${DB_SA_PASSWORD}"
-      ACCEPT_EULA: "Y"
-    volumes:
-      - ./db/scripts:/docker-entrypoint-initdb.d
+      POSTGRES_USER: "${DB_ROOT_USER}"
+      POSTGRES_PASSWORD: "${DB_ROOT_PASSWORD}"
+      POSTGRES_DB: "MovieDatabaseDb"
     ports:
-      - "${DB_PORT}:1433"
+      - "${DB_PORT}:5432"
+    networks:
+      - movie-database-app-bridge
+
+  adminer:
+    image: adminer:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-adminer
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: "database"
+    depends_on:
+      - database
     networks:
       - movie-database-app-bridge
 
@@ -20,7 +30,7 @@ services:
     expose:
       - "${APP_INTERNAL_PORT}"
     environment:
-      ConnectionStrings__DefaultConnection: "Server=database;Database=MovieDatabaseDb;User Id=sa;Password=${DB_SA_PASSWORD};TrustServerCertificate=True;"
+      ConnectionStrings__DefaultConnection: "Host=database;Port=5432;Database=MovieDatabaseDb;Username=${DB_ROOT_USER};Password=${DB_ROOT_PASSWORD};"
       ASPNETCORE_URLS: "http://+:${APP_INTERNAL_PORT}"
     depends_on:
       - database
@@ -36,6 +46,8 @@ services:
       - "./nginx/templates:/etc/nginx/templates/"
     environment:
       APP_INTERNAL_PORT: "${APP_INTERNAL_PORT}"
+    depends_on:
+      - moviedatabaseapp
     networks:
       - movie-database-app-bridge
 

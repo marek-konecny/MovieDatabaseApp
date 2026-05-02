@@ -13,8 +13,9 @@ An example of `.env` suitable for both development or deployment:
 
 ```
 COMPOSE_PROJECT_NAME=moviedatabaseapp
-DB_SA_PASSWORD=adminHesl0-
-DB_PORT=1433 #default for ms sql express
+DB_ROOT_USER=postgres
+DB_ROOT_PASSWORD=adminHesl0-
+DB_PORT=5432 #default for PostgreSQL
 NGINX_PORT=80 #http
 APP_INTERNAL_PORT=5000
 ```
@@ -23,7 +24,7 @@ APP_INTERNAL_PORT=5000
 
 1. `cd docker`
 2. Supply appropriate `.env` script
-3. `docker-compose up --build database`
+3. `docker compose up --build database adminer -d`
 4. `cd ../src/MovieDatabaseApp/`
 5. `dotnet watch`
 
