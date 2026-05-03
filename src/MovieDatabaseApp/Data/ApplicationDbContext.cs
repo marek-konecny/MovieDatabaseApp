@@ -69,8 +69,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     protected void InitUserRoles(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<IdentityRole>().HasData(
-            new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
-            new IdentityRole { Id = "2", Name = "User", NormalizedName = "USER" }
+            new IdentityRole { Id = "1", Name = "User", NormalizedName = "USER" },
+            new IdentityRole { Id = "2", Name = "VIP", NormalizedName = "VIP" },
+            new IdentityRole { Id = "3", Name = "Admin", NormalizedName = "ADMIN" }
         );
     }
 
