@@ -21,6 +21,7 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 builder.Services.AddScoped<UserManager<ApplicationUser>, AppUserManager>();
+builder.Services.AddScoped<UserRegistrationService>();
 
 builder.Services.AddAuthentication(options =>
     {
