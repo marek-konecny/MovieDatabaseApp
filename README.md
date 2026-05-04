@@ -3,16 +3,18 @@
 ## File Structure
 
 - `docs/` - Documentation; currently assignment and DB schema from initial analysis.
-- `docker/` - Docker deployment related files and DB migration script for DB initialization.
-- `src/MovieDatabaseApp/` - The main application implementation.
+- `docker/` - Docker deployment related files.
+- `src/MovieDatabaseApp.Core/` - Core models and services.
+- `src/MovieDatabaseApp.WebApp/` - The main web application implementation.
 
 ## Environment
 
-An `.env` file must be supplied in the `docker/` directory for both development and deployment.
+An `.env` file must be supplied in the root directory for both development and deployment.
 An example of `.env` suitable for both development or deployment:
 
 ```
 COMPOSE_PROJECT_NAME=moviedatabaseapp
+DB_NAME=MovieDatabaseAppDb
 DB_ROOT_USER=postgres
 DB_ROOT_PASSWORD=adminHesl0-
 DB_PORT=5432 #default for PostgreSQL
@@ -24,7 +26,7 @@ APP_INTERNAL_PORT=5000
 
 1. Supply appropriate `.env` script
 2. `docker compose up --build database adminer -d`
-3. `(cd src/MovieDatabaseApp.WebApp/ && dotnet watch)`
+3. `dotnet watch -p src/MovieDatabaseApp.WebApp`
 
 ## Deployment
 
