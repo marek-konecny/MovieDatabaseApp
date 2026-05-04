@@ -2,9 +2,9 @@ server {
     listen 80;
     server_name localhost;
 
-    #forward requests to the .NET app
+    #forward requests to the .NET web app
     location / {
-        proxy_pass http://moviedatabaseapp:${APP_INTERNAL_PORT};
+        proxy_pass http://webapp:${APP_INTERNAL_PORT};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

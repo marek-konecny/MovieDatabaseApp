@@ -1,0 +1,90 @@
+﻿@implements IDisposable
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using MovieDatabaseApp.WebApp.Components.Account
+@using MovieDatabaseApp.Core.Models
+@using System.Security.Claims
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IDbContextFactory<ApplicationDbContext> DbContextFactory
+
+<MudNavMenu class="d-flex gap-2" Rounded="true" Color="Color.Primary"> 
+    <MudNavLink Href="movies" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Movie">Movies</MudNavLink> 
+    <MudNavLink Href="actors" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Stars">Actors</MudNavLink> 
+     
+    <AuthorizeView> 
+        <Authorized> 
+            @* <AuthorizeView Roles="Admin"> 
+                <Authorized Context="adminContext"> 
+                    <MudNavLink Href="Profiles" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonSearch">Users</MudNavLink> 
+                </Authorized> 
+            </AuthorizeView> *@ 
+ 
+            <div class="ml-7 d-flex gap-2"> 
+                <MudNavLink Icon="@Icons.Material.Rounded.Person" Href="account/manage" Match="NavLinkMatch.Prefix">Account</MudNavLink> 
+                     
+                <form action="account/logout" method="post"> 
+                    <AntiforgeryToken /> 
+                    <input type="hidden" name="ReturnUrl" value="@currentUrl"/> 
+                    <button type="submit" class="mud-nav-link mud-ripple"><MudIcon Icon="@Icons.Material.Outlined.Logout"/></button> 
+                </form> 
+            </div> 
+        </Authorized> 
+        <NotAuthorized> 
+            <div class="ml-7 d-flex gap-2"> 
+                <MudNavLink Href="account/login" Icon="@Icons.Material.Filled.Password" Match="NavLinkMatch.Prefix">Login</MudNavLink> 
+                <MudNavLink Href="account/register" Icon="@Icons.Material.Filled.Person" Match="NavLinkMatch.Prefix">Register</MudNavLink> 
+            </div> 
+        </NotAuthorized> 
+    </AuthorizeView> 
+</MudNavMenu> 
+
+@code {
+    private string? currentUrl;
+
+    @* private string? profileImageUrl = null;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!; *@
+
+    @*protected override async Task OnInitializedAsync()  void OnInitialized()*@
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+
+        @* var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId != null)
+        {
+            Console.WriteLine("User ID: " + userId);
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            var userProfile = await dbContext.UserProfiles
+                .Include(up => up.ProfileImage)
+                .FirstOrDefaultAsync(up => up.UserId == userId);
+
+            Console.WriteLine(userProfile == null ? "User profile not found." : "User profile found.");
+            Console.WriteLine(userProfile?.ToString());
+            Console.WriteLine(userProfile?.ProfileImage?.ToString());
+            profileImageUrl = userProfile?.ProfileImage?.Url;
+        } *@
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+}
+

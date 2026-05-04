@@ -1,0 +1,62 @@
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: ${COMPOSE_PROJECT_NAME}-db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_ROOT_USER} -d MovieDatabaseDb"]
+      interval: 5s
+      timeout: 5s
+    environment:
+      POSTGRES_USER: "${DB_ROOT_USER}"
+      POSTGRES_PASSWORD: "${DB_ROOT_PASSWORD}"
+      POSTGRES_DB: "MovieDatabaseDb"
+    ports:
+      - "${DB_PORT}:5432"
+    networks:
+      - movie-database-app-bridge
+
+  adminer:
+    image: adminer:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-adminer
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: "database"
+    depends_on:
+      - database
+    networks:
+      - movie-database-app-bridge
+
+  webapp:
+    build:
+      context: .
+      dockerfile: docker/WebApp/Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME}-webapp
+    expose:
+      - "${APP_INTERNAL_PORT}"
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=database;Port=5432;Database=MovieDatabaseDb;Username=${DB_ROOT_USER};Password=${DB_ROOT_PASSWORD};"
+      ASPNETCORE_URLS: "http://+:${APP_INTERNAL_PORT}"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - movie-database-app-bridge
+
+  nginx:
+    image: nginx:alpine
+    container_name: ${COMPOSE_PROJECT_NAME}-proxy
+    ports:
+      - "${NGINX_PORT}:80"
+    volumes:
+      - "./docker/nginx/templates:/etc/nginx/templates/"
+    environment:
+      APP_INTERNAL_PORT: "${APP_INTERNAL_PORT}"
+    depends_on:
+      - webapp
+    networks:
+      - movie-database-app-bridge
+
+networks:
+  movie-database-app-bridge:
+    driver: bridge

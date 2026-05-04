@@ -22,23 +22,14 @@ APP_INTERNAL_PORT=5000
 
 ## Development
 
-1. `cd docker`
-2. Supply appropriate `.env` script
-3. `docker compose up --build database adminer -d`
-4. `cd ../src/MovieDatabaseApp/`
-5. `dotnet watch`
-
-Initially I planned to center the project around code-first .NET database migrations.
-These however, turned out to be problematic with Docker as I yet have to find a way to
-properly check and wait for a healthy database state before deploying the migrations.
-
-As of now, the initial schema / seed migration is handled by generated .SQL script and fixed wait time.
+1. Supply appropriate `.env` script
+2. `docker compose up --build database adminer -d`
+3. `(cd src/MovieDatabaseApp.WebApp/ && dotnet watch)`
 
 ## Deployment
 
-1. `cd docker`
-2. Supply appropriate `.env` script
-3. `sudo docker compose up -d --build`
+1. Supply appropriate `.env` script
+2. `docker compose up -d --build`
 
 ## State of development
 

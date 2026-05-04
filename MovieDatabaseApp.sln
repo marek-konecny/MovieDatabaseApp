@@ -5,7 +5,7 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieDatabaseApp", "src\MovieDatabaseApp\MovieDatabaseApp.csproj", "{399C43C4-42BE-B52A-5686-15E0CD72B1CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieDatabaseApp", "src\MovieDatabaseApp.WebApp\MovieDatabaseApp.WebApp.csproj", "{399C43C4-42BE-B52A-5686-15E0CD72B1CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieDatabaseApp.Core", "src\MovieDatabaseApp.Core\MovieDatabaseApp.Core.csproj", "{0E6A133A-9785-47B9-900F-42B28838234A}"
 EndProject
