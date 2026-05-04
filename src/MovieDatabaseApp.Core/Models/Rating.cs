@@ -1,4 +1,4 @@
-namespace MovieDatabaseApp.Data.Models;
+namespace MovieDatabaseApp.Core.Models;
 
 public class Rating
 {

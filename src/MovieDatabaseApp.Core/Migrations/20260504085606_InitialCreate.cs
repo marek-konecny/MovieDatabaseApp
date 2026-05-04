@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace MovieDatabaseApp.Data.Migrations
+namespace MovieDatabaseApp.Core.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -293,8 +293,9 @@ namespace MovieDatabaseApp.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1", null, "Admin", "ADMIN" },
-                    { "2", null, "User", "USER" }
+                    { "1", null, "User", "USER" },
+                    { "2", null, "VIP", "VIP" },
+                    { "3", null, "Admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(

@@ -20,4 +20,8 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MovieDatabaseApp.Core\MovieDatabaseApp.Core.csproj" />
+  </ItemGroup>
+
 </Project>

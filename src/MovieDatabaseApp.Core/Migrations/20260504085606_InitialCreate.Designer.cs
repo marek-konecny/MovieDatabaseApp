@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MovieDatabaseApp.Data;
+using MovieDatabaseApp.Core.Models;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MovieDatabaseApp.Data.Migrations
+namespace MovieDatabaseApp.Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260504085606_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,14 +54,20 @@ namespace MovieDatabaseApp.Data.Migrations
                         new
                         {
                             Id = "1",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
+                            Name = "User",
+                            NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "2",
-                            Name = "User",
-                            NormalizedName = "USER"
+                            Name = "VIP",
+                            NormalizedName = "VIP"
+                        },
+                        new
+                        {
+                            Id = "3",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
                         });
                 });
 
@@ -168,7 +177,48 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.ApplicationUser", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.Actor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("BirthDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("PosterImageId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PosterImageId");
+
+                    b.ToTable("Actors");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BirthDate = new DateOnly(1965, 4, 4),
+                            FullName = "Robert Downey Jr.",
+                            PosterImageId = 3
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BirthDate = new DateOnly(1981, 6, 13),
+                            FullName = "Chris Evans",
+                            PosterImageId = 4
+                        });
+                });
+
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
@@ -235,48 +285,7 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.Actor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateOnly>("BirthDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("PosterImageId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PosterImageId");
-
-                    b.ToTable("Actors");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BirthDate = new DateOnly(1965, 4, 4),
-                            FullName = "Robert Downey Jr.",
-                            PosterImageId = 3
-                        },
-                        new
-                        {
-                            Id = 2,
-                            BirthDate = new DateOnly(1981, 6, 13),
-                            FullName = "Chris Evans",
-                            PosterImageId = 4
-                        });
-                });
-
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.Image", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.Image", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -315,7 +324,7 @@ namespace MovieDatabaseApp.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.Movie", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.Movie", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -356,7 +365,7 @@ namespace MovieDatabaseApp.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.MovieActor", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.MovieActor", b =>
                 {
                     b.Property<int>("MovieId")
                         .HasColumnType("integer");
@@ -383,7 +392,7 @@ namespace MovieDatabaseApp.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.Rating", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.Rating", b =>
                 {
                     b.Property<int>("MovieId")
                         .HasColumnType("integer");
@@ -410,7 +419,7 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.ToTable("Ratings");
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.UserProfile", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.UserProfile", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("text");
@@ -436,7 +445,7 @@ namespace MovieDatabaseApp.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("MovieDatabaseApp.Data.ApplicationUser", null)
+                    b.HasOne("MovieDatabaseApp.Core.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -445,7 +454,7 @@ namespace MovieDatabaseApp.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("MovieDatabaseApp.Data.ApplicationUser", null)
+                    b.HasOne("MovieDatabaseApp.Core.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -460,7 +469,7 @@ namespace MovieDatabaseApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MovieDatabaseApp.Data.ApplicationUser", null)
+                    b.HasOne("MovieDatabaseApp.Core.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -469,40 +478,40 @@ namespace MovieDatabaseApp.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("MovieDatabaseApp.Data.ApplicationUser", null)
+                    b.HasOne("MovieDatabaseApp.Core.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.Actor", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.Actor", b =>
                 {
-                    b.HasOne("MovieDatabaseApp.Data.Models.Image", "PosterImage")
+                    b.HasOne("MovieDatabaseApp.Core.Models.Image", "PosterImage")
                         .WithMany()
                         .HasForeignKey("PosterImageId");
 
                     b.Navigation("PosterImage");
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.Movie", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.Movie", b =>
                 {
-                    b.HasOne("MovieDatabaseApp.Data.Models.Image", "PosterImage")
+                    b.HasOne("MovieDatabaseApp.Core.Models.Image", "PosterImage")
                         .WithMany()
                         .HasForeignKey("PosterImageId");
 
                     b.Navigation("PosterImage");
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.MovieActor", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.MovieActor", b =>
                 {
-                    b.HasOne("MovieDatabaseApp.Data.Models.Actor", "Actor")
+                    b.HasOne("MovieDatabaseApp.Core.Models.Actor", "Actor")
                         .WithMany("MovieActors")
                         .HasForeignKey("ActorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MovieDatabaseApp.Data.Models.Movie", "Movie")
+                    b.HasOne("MovieDatabaseApp.Core.Models.Movie", "Movie")
                         .WithMany("MovieActors")
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -513,15 +522,15 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.Navigation("Movie");
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.Rating", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.Rating", b =>
                 {
-                    b.HasOne("MovieDatabaseApp.Data.Models.Movie", "Movie")
+                    b.HasOne("MovieDatabaseApp.Core.Models.Movie", "Movie")
                         .WithMany("Ratings")
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MovieDatabaseApp.Data.ApplicationUser", "User")
+                    b.HasOne("MovieDatabaseApp.Core.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -532,15 +541,15 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.UserProfile", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.UserProfile", b =>
                 {
-                    b.HasOne("MovieDatabaseApp.Data.Models.Image", "ProfileImage")
+                    b.HasOne("MovieDatabaseApp.Core.Models.Image", "ProfileImage")
                         .WithMany()
                         .HasForeignKey("ProfileImageId");
 
-                    b.HasOne("MovieDatabaseApp.Data.ApplicationUser", "User")
+                    b.HasOne("MovieDatabaseApp.Core.Models.ApplicationUser", "User")
                         .WithOne()
-                        .HasForeignKey("MovieDatabaseApp.Data.Models.UserProfile", "UserId")
+                        .HasForeignKey("MovieDatabaseApp.Core.Models.UserProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -549,12 +558,12 @@ namespace MovieDatabaseApp.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.Actor", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.Actor", b =>
                 {
                     b.Navigation("MovieActors");
                 });
 
-            modelBuilder.Entity("MovieDatabaseApp.Data.Models.Movie", b =>
+            modelBuilder.Entity("MovieDatabaseApp.Core.Models.Movie", b =>
                 {
                     b.Navigation("MovieActors");
 

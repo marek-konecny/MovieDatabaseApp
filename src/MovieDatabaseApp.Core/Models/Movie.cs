@@ -1,4 +1,4 @@
-namespace MovieDatabaseApp.Data.Models;
+namespace MovieDatabaseApp.Core.Models;
 
 public class Movie
 {
@@ -8,6 +8,6 @@ public class Movie
     public int? PosterImageId { get; set; }
 
     public Image? PosterImage { get; set; }
-    public List<MovieActor> MovieActors { get; set; } = new List<MovieActor>();
-    public List<Rating> Ratings { get; set; } = new List<Rating>();
+    public List<MovieActor> MovieActors { get; set; } = [];
+    public List<Rating> Ratings { get; set; } = [];
 }

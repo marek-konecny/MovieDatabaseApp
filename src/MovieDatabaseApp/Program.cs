@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MovieDatabaseApp.Components;
 using MovieDatabaseApp.Components.Account;
-using MovieDatabaseApp.Data;
+using MovieDatabaseApp.Core.Models;
+using MovieDatabaseApp.Core.Services;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);

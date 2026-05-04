@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using MovieDatabaseApp.Data;
+using MovieDatabaseApp.Core.Models;
 
 namespace MovieDatabaseApp.Components.Account;
 

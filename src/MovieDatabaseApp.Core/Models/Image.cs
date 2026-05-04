@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace MovieDatabaseApp.Data.Models;
+namespace MovieDatabaseApp.Core.Models;
 
 public class Image
 {

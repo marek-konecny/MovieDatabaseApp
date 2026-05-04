@@ -1,16 +1,11 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MovieDatabaseApp.Data.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace MovieDatabaseApp.Data;
+namespace MovieDatabaseApp.Core.Models;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-    }
-
     public DbSet<Actor> Actors { get; set; } = null!;
     public DbSet<Image> Images { get; set; } = null!;
     public DbSet<Movie> Movies { get; set; } = null!;

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using MovieDatabaseApp.Data;
+using MovieDatabaseApp.Core.Models;
 
 namespace MovieDatabaseApp.Components.Account;
 
